@@ -12,4 +12,22 @@
       title.textContent=titles[b.dataset.tab]||'EHPAD';
     });
   });
+
+  // Calendar (like mobile)
+  const cal=document.getElementById('calendar');
+  const monthTitle=document.getElementById('monthTitle');
+  if(cal){
+    const now=new Date();
+    const y=now.getFullYear();
+    const m=now.getMonth();
+    monthTitle.textContent=now.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+    const days=new Date(y,m+1,0).getDate();
+    for(let d=1;d<=days;d++){
+      const el=document.createElement('div');
+      el.className='day';
+      if(d===now.getDate()) el.classList.add('today');
+      el.textContent=d;
+      cal.appendChild(el);
+    }
+  }
 })();

@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>EHPAD – Version PC complète</title>
+  <title>EHPAD – Version PC (comme mobile)</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -26,24 +26,35 @@
       <h1 id="pageTitle">Planning</h1>
     </header>
 
+    <!-- PLANNING -->
     <section class="panel active" data-panel="planning">
-      <div class="grid">
-        <div class="card">Calendrier (démo)</div>
-        <div class="card">Planning personnel</div>
-        <div class="card">Planning unité</div>
-        <div class="card">Collègues présents</div>
+      <div class="planning-layout">
+        <div class="calendar-card">
+          <h3 id="monthTitle"></h3>
+          <div class="calendar-grid" id="calendar"></div>
+        </div>
+        <div class="card">
+          <h3>Mes horaires</h3>
+          <ul id="shifts">
+            <li>07:00 – 14:00</li>
+            <li>14:00 – 21:30</li>
+          </ul>
+        </div>
       </div>
     </section>
 
+    <!-- ÉCHANGES -->
     <section class="panel" data-panel="echanges">
       <div class="card wide">
         <h3>Échanges d’horaires</h3>
         <label>Date</label><input type="date">
+        <label>Horaire proposé</label><input type="text" placeholder="Ex : 14h-21h30">
         <label>Collègue</label><input type="text">
         <button class="primary">Proposer un échange</button>
       </div>
     </section>
 
+    <!-- MESSAGERIE -->
     <section class="panel" data-panel="messagerie">
       <div class="card wide">
         <h3>Messagerie</h3>
@@ -52,6 +63,7 @@
       </div>
     </section>
 
+    <!-- DISPONIBILITÉS -->
     <section class="panel" data-panel="disponibilites">
       <div class="card wide">
         <h3>Disponibilités / Arrêt maladie</h3>
@@ -66,15 +78,17 @@
       </div>
     </section>
 
+    <!-- HEURES -->
     <section class="panel" data-panel="heures">
       <div class="card wide">
         <h3>Heures supplémentaires</h3>
-        <label>Durée</label>
-        <input type="number" placeholder="Minutes">
+        <label>Durée (minutes)</label>
+        <input type="number">
         <button class="primary">Déclarer</button>
       </div>
     </section>
 
+    <!-- PROFIL -->
     <section class="panel" data-panel="profil">
       <div class="card wide">
         <h3>Profil & Santé</h3>
@@ -86,6 +100,7 @@
       </div>
     </section>
 
+    <!-- DIRECTION -->
     <section class="panel" data-panel="direction">
       <div class="card wide">
         <h3>Direction</h3>
@@ -93,6 +108,7 @@
       </div>
     </section>
 
+    <!-- CONTACT -->
     <section class="panel" data-panel="contact">
       <div class="card wide">
         <h3>Contact EHPAD</h3>
@@ -100,7 +116,6 @@
         <p>Téléphone : 01 00 00 00 00</p>
       </div>
     </section>
-
   </main>
 </div>
 
