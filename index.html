@@ -2,96 +2,108 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>EHPAD – Version PC (Style iOS)</title>
+  <title>EHPAD – Version PC complète</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
 <div id="app">
   <aside class="sidebar">
     <h2>EHPAD</h2>
     <nav>
-      <button class="active" data-tab="planning">Planning</button>
+      <button data-tab="planning" class="active">Planning</button>
       <button data-tab="echanges">Échanges</button>
       <button data-tab="messagerie">Messagerie</button>
+      <button data-tab="disponibilites">Disponibilités</button>
+      <button data-tab="heures">Heures sup</button>
+      <button data-tab="profil">Profil & Santé</button>
       <button data-tab="direction">Direction</button>
-      <button data-tab="profil">Profil</button>
+      <button data-tab="contact">Contact</button>
     </nav>
   </aside>
 
-  
   <main class="content">
-    <div class="topbar">
+    <header class="topbar">
       <h1 id="pageTitle">Planning</h1>
-      <div class="chip">Version PC • style iOS</div>
-    </div>
+    </header>
 
     <section class="panel active" data-panel="planning">
       <div class="grid">
-        <div class="card">
-          <h3>Calendrier</h3>
-          <p class="muted">Aperçu (démo). On peut brancher ton calendrier/planning réel ensuite.</p>
-        </div>
-        <div class="card">
-          <h3>Disponibilités</h3>
-          <p class="muted">Démo : disponible / indisponible / arrêt maladie.</p>
-          <div class="form">
-            <label>Statut</label>
-            <select id="status">
-              <option>Disponible</option>
-              <option>Indisponible</option>
-              <option>Arrêt maladie</option>
-            </select>
-            <label>Date</label>
-            <input type="date" id="date" />
-            <label>Note (optionnel)</label>
-            <input type="text" id="note" placeholder="Ex : RDV médical" />
-            <button class="primary" id="saveBtn">Enregistrer</button>
-            <div id="result" class="result"></div>
-          </div>
-        </div>
-        <div class="card">
-          <h3>Équipe</h3>
-          <p class="muted">Liste de collègues / unité (démo).</p>
-        </div>
-        <div class="card">
-          <h3>Notes</h3>
-          <p class="muted">Notes internes (démo).</p>
-        </div>
+        <div class="card">Calendrier (démo)</div>
+        <div class="card">Planning personnel</div>
+        <div class="card">Planning unité</div>
+        <div class="card">Collègues présents</div>
       </div>
     </section>
 
     <section class="panel" data-panel="echanges">
       <div class="card wide">
-        <h3>Échanges</h3>
-        <p class="muted">Ici : demandes d’échanges et validations (démo). On peut réintégrer tes écrans complets ensuite.</p>
+        <h3>Échanges d’horaires</h3>
+        <label>Date</label><input type="date">
+        <label>Collègue</label><input type="text">
+        <button class="primary">Proposer un échange</button>
       </div>
     </section>
 
     <section class="panel" data-panel="messagerie">
       <div class="card wide">
         <h3>Messagerie</h3>
-        <p class="muted">Vue PC (démo). On peut passer en 2 colonnes (liste + conversation) si tu veux.</p>
+        <textarea placeholder="Message..." rows="4"></textarea>
+        <button class="primary">Envoyer</button>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="disponibilites">
+      <div class="card wide">
+        <h3>Disponibilités / Arrêt maladie</h3>
+        <label>Statut</label>
+        <select>
+          <option>Disponible</option>
+          <option>Indisponible</option>
+          <option>Arrêt maladie</option>
+        </select>
+        <label>Date</label><input type="date">
+        <button class="primary">Enregistrer</button>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="heures">
+      <div class="card wide">
+        <h3>Heures supplémentaires</h3>
+        <label>Durée</label>
+        <input type="number" placeholder="Minutes">
+        <button class="primary">Déclarer</button>
+      </div>
+    </section>
+
+    <section class="panel" data-panel="profil">
+      <div class="card wide">
+        <h3>Profil & Santé</h3>
+        <input placeholder="Nom">
+        <input placeholder="Allergies">
+        <input placeholder="Traitements">
+        <input placeholder="Poids">
+        <input placeholder="Taille">
       </div>
     </section>
 
     <section class="panel" data-panel="direction">
       <div class="card wide">
         <h3>Direction</h3>
-        <p class="muted">Zone direction (démo) : planning, validations, etc.</p>
+        <p>Validation des échanges, plannings et absences.</p>
       </div>
     </section>
 
-    <section class="panel" data-panel="profil">
+    <section class="panel" data-panel="contact">
       <div class="card wide">
-        <h3>Profil</h3>
-        <p class="muted">Infos agent (démo).</p>
+        <h3>Contact EHPAD</h3>
+        <p>Email : contact@ehpad.fr</p>
+        <p>Téléphone : 01 00 00 00 00</p>
       </div>
     </section>
-  </main>
 
+  </main>
 </div>
 
-  <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
