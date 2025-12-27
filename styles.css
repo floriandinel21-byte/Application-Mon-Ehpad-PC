@@ -531,3 +531,30 @@ body {
     top: 0;
   }
 }
+
+.tabbar { display: none !important; }
+
+.desktop-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  gap: 12px;
+  padding: 12px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.desktop-nav button {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  background: #f2f2f7;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.desktop-nav button:hover {
+  background: #4f8cff;
+  color: #fff;
+}

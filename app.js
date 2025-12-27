@@ -1341,3 +1341,17 @@ function capitalize(s){ return s ? (s.charAt(0).toUpperCase() + s.slice(1)) : s;
 
   });
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+  document.querySelectorAll(".desktop-nav button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const target = btn.dataset.tab;
+      const mobileBtn =
+        document.querySelector(`.tabbar button[data-tab="${target}"]`) ||
+        [...document.querySelectorAll(".tabbar button")].find(b =>
+          b.textContent.toLowerCase().includes(target)
+        );
+      if (mobileBtn) mobileBtn.click();
+    });
+  });
+});
