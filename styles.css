@@ -468,11 +468,7 @@ textarea{min-height:92px;resize:vertical}
   height: 100vh;
 }
 
-.pc-sidebar {
-  background: #0b1220;
-  color: #fff;
-  padding: 20px;
-}
+
 
 .pc-content {
   padding: 20px;
@@ -487,5 +483,51 @@ textarea{min-height:92px;resize:vertical}
 @media (min-width: 900px) {
   .tabbar {
     display: none !important;
+  }
+}
+
+
+
+
+
+
+
+
+/* ===============================
+   MODE PC FULL HD (1920x1080)
+   =============================== */
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  background: #f2f2f7;
+}
+
+/* App takes full HD width */
+.app {
+  width: 100%;
+  max-width: 1920px;
+  height: 100vh;
+  margin: 0;
+}
+
+/* Hide mobile constraints */
+.app {
+  border-radius: 0 !important;
+}
+
+/* Tabbar repositioned for desktop */
+@media (min-width: 1200px) {
+  .tabbar {
+    position: sticky;
+    bottom: auto;
+    top: 0;
   }
 }
