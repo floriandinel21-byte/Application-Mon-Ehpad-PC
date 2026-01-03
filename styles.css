@@ -584,3 +584,106 @@ hr, .divider{
 *{
   -webkit-tap-highlight-color: rgba(10,132,255,.15);
 }
+
+
+
+/* ==================================================
+   MODE PC — LAYOUT DESKTOP (Garde les fonctionnalités)
+   - Pas de format téléphone
+   - Utilise l’écran large
+   - Réutilise la tabbar comme menu vertical (CSS only)
+   ================================================== */
+
+@media (min-width: 1024px) {
+  body{
+    margin:0;
+    background: var(--ios-bg, #f2f2f7);
+  }
+
+  /* App prend l'écran, sans aspect "téléphone" */
+  .app{
+    width: min(1600px, 100%) !important;
+    height: 100vh !important;
+    margin: 0 auto !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    display: grid !important;
+    grid-template-columns: 300px 1fr !important;
+    grid-template-rows: auto 1fr !important;
+  }
+
+  /* Optionnel : barre iOS de statut inutile sur PC */
+  .statusbar{ display:none !important; }
+
+  /* Appbar reste en haut du contenu */
+  .appbar{
+    grid-column: 2;
+    grid-row: 1;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+  }
+
+  .main{
+    grid-column: 2;
+    grid-row: 2;
+    overflow: auto;
+    padding: 18px 18px 24px !important;
+  }
+
+  /* Tabbar devient un menu vertical à gauche */
+  .tabbar{
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    position: relative !important;
+    bottom: auto !important;
+    top: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 18px !important;
+    border-top: none !important;
+    border-right: 1px solid var(--ios-sep, rgba(60,60,67,.16)) !important;
+    background: rgba(255,255,255,.72) !important;
+    backdrop-filter: blur(18px) !important;
+    -webkit-backdrop-filter: blur(18px) !important;
+  }
+
+  .tab{
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 10px !important;
+    padding: 12px 12px !important;
+    border-radius: 14px !important;
+    border: 1px solid var(--ios-sep, rgba(60,60,67,.16)) !important;
+    background: rgba(255,255,255,.85) !important;
+  }
+  .tab.active{
+    background: rgba(10,132,255,.12) !important;
+    border-color: rgba(10,132,255,.22) !important;
+  }
+
+  /* Légendes lisibles sur PC */
+  .tab .label{
+    font-size: 14px !important;
+    font-weight: 800 !important;
+  }
+
+  /* Cartes : plus larges et mieux espacées */
+  .card{
+    width: 100% !important;
+  }
+
+  /* Grilles internes : profitent de l'espace */
+  .split{
+    grid-template-columns: 1fr 1fr !important;
+    gap: 14px !important;
+  }
+
+  /* Modales : centrées comme desktop */
+  .modal{
+    max-width: 720px !important;
+  }
+}
