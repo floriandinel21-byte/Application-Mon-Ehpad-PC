@@ -225,6 +225,11 @@ function isDirection(){ return state.session.role === "direction"; }
 function viewPlanningAgent(){
   const u = me();
   const unit = u.unit;
+  const nextShift = getNextShift(u.id);
+  const weekMinutes = getWeekMinutes(u.id);
+  const pendingSwaps = state.swapRequests.filter(r => r.status === "pending" && (r.requesterId === u.id || r.targetId === u.id)).length;
+  const pendingLeaves = state.leaveRequests.filter(r => r.status === "pending" && r.userId === u.id).length;
+  const pendingOT = state.overtime.filter(r => r.status === "pending" && r.userId === u.id).length;
   // iOS-like month calendar
   return `
     <div class="carditem">
@@ -236,6 +241,29 @@ function viewPlanningAgent(){
         unit,
         meId: u.id
       })}
+    </div>
+
+    <div class="carditem">
+      <h3>Infos rapides</h3>
+      <div class="muted">Résumé de ta semaine en un coup d’œil</div>
+      <div class="hr"></div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Prochain poste</div>
+          <div class="stat-value">${nextShift ? `${fmtDate(nextShift.date)} • ${nextShift.start}-${nextShift.end}` : "Aucun"}</div>
+          <div class="muted">${nextShift ? nextShift.label : "Pas de poste programmé"}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Temps sur 7 jours</div>
+          <div class="stat-value">${formatHours(weekMinutes)}</div>
+          <div class="muted">Heures prévues (7 jours)</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Demandes en attente</div>
+          <div class="stat-value">${pendingSwaps + pendingLeaves + pendingOT}</div>
+          <div class="muted">${pendingSwaps} échanges • ${pendingLeaves} absences • ${pendingOT} heures supp</div>
+        </div>
+      </div>
     </div>
 
     <div class="carditem">
@@ -269,6 +297,12 @@ function viewPlanningAgent(){
 
 function viewPlanningDirection(){
   const unit = "Unité A";
+  const monthStats = getMonthStats(unit);
+  const pendingCounts = {
+    swaps: state.swapRequests.filter(r => r.status === "pending").length,
+    leaves: state.leaveRequests.filter(r => r.status === "pending").length,
+    overtime: state.overtime.filter(r => r.status === "pending").length
+  };
   return `
     <div class="carditem">
       <h3>Planning global</h3>
@@ -281,6 +315,29 @@ function viewPlanningDirection(){
       })}
       <div class="hr"></div>
       <div class="muted">Astuce : la mise à jour par glisser-déposer se ferait dans la vraie version (Firebase / serveur).</div>
+    </div>
+
+    <div class="carditem">
+      <h3>Indicateurs clés</h3>
+      <div class="muted">Synthèse du mois et des validations</div>
+      <div class="hr"></div>
+      <div class="stat-grid">
+        <div class="stat-card">
+          <div class="stat-label">Postes programmés</div>
+          <div class="stat-value">${monthStats.shiftCount}</div>
+          <div class="muted">${monthStats.monthLabel}</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Agents planifiés</div>
+          <div class="stat-value">${monthStats.agentCount}</div>
+          <div class="muted">Sur ${monthStats.totalAgents} agents</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Demandes en attente</div>
+          <div class="stat-value">${pendingCounts.swaps + pendingCounts.leaves + pendingCounts.overtime}</div>
+          <div class="muted">${pendingCounts.swaps} échanges • ${pendingCounts.leaves} absences • ${pendingCounts.overtime} heures supp</div>
+        </div>
+      </div>
     </div>
   `;
 }
@@ -1134,6 +1191,19 @@ function toast(msg){
   window.__toastTimer = setTimeout(()=> el.classList.add("hidden"), 2200);
 }
 
+function applyDayNightTheme(){
+  const now = new Date();
+  const hour = now.getHours() + now.getMinutes() / 60;
+  const sunrise = 7;
+  const sunset = 19;
+  const isDay = hour >= sunrise && hour < sunset;
+  const root = document.documentElement;
+  root.classList.toggle("theme-dark", !isDay);
+  root.classList.toggle("theme-light", isDay);
+  document.body.classList.toggle("theme-dark", !isDay);
+  document.body.classList.toggle("theme-light", isDay);
+}
+
 function nextDays(n){
   const out = [];
   const d = new Date();
@@ -1207,6 +1277,8 @@ function bindIOSCalendar(){
 // Boot
 render();
 saveState(); // ensure seed persists
+applyDayNightTheme();
+setInterval(applyDayNightTheme, 5 * 60 * 1000);
 function monthLabel(year, monthIndex){
   const d = new Date(year, monthIndex, 1);
   return d.toLocaleDateString("fr-FR",{month:"long", year:"numeric"});
@@ -1335,4 +1407,53 @@ function detailLine(time, label, tagText, tagClass){
 }
 function capitalize(s){ return s ? (s.charAt(0).toUpperCase() + s.slice(1)) : s; }
 
+function getNextShift(userId){
+  const now = new Date();
+  return state.shifts
+    .filter(s => s.userId === userId)
+    .map(s => ({...s, startsAt: new Date(`${s.date}T${s.start}:00`)}))
+    .filter(s => s.startsAt >= now)
+    .sort((a,b) => a.startsAt - b.startsAt)[0] || null;
+}
 
+function getWeekMinutes(userId){
+  const start = new Date();
+  const end = new Date();
+  end.setDate(start.getDate() + 6);
+  const startIso = iso(start);
+  const endIso = iso(end);
+  return state.shifts
+    .filter(s => s.userId === userId && s.date >= startIso && s.date <= endIso)
+    .reduce((sum, s) => sum + shiftMinutes(s.start, s.end), 0);
+}
+
+function shiftMinutes(start, end){
+  const [sh, sm] = start.split(":").map(Number);
+  const [eh, em] = end.split(":").map(Number);
+  return (eh * 60 + em) - (sh * 60 + sm);
+}
+
+function formatHours(minutes){
+  const hours = Math.max(0, minutes);
+  const h = Math.floor(hours / 60);
+  const m = hours % 60;
+  return `${h}h${m ? String(m).padStart(2, "0") : "00"}`;
+}
+
+function getMonthStats(unit){
+  const today = new Date();
+  const ym = state.ui?.calendarYM || {y: today.getFullYear(), m: today.getMonth()};
+  const monthStart = new Date(ym.y, ym.m, 1);
+  const monthEnd = new Date(ym.y, ym.m + 1, 0);
+  const startIso = iso(monthStart);
+  const endIso = iso(monthEnd);
+  const shifts = state.shifts.filter(s => s.unit === unit && s.date >= startIso && s.date <= endIso);
+  const agentIds = new Set(shifts.map(s => s.userId));
+  const totalAgents = state.users.filter(u => u.role === "agent" && u.unit === unit).length;
+  return {
+    shiftCount: shifts.length,
+    agentCount: agentIds.size,
+    totalAgents,
+    monthLabel: capitalize(monthLabel(ym.y, ym.m))
+  };
+}

@@ -207,6 +207,27 @@ textarea{min-height:92px;resize:vertical}
 }
 .carditem h3{margin:0 0 8px;font-size:14px}
 .muted{color:var(--muted);font-size:12px}
+.stat-grid{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:12px;
+}
+.stat-card{
+  padding:12px;
+  border-radius: 14px;
+  border:1px solid rgba(255,255,255,.08);
+  background: rgba(255,255,255,.02);
+  border-left: 4px solid rgba(79,140,255,.65);
+}
+.stat-label{
+  font-size:12px;
+  color:var(--muted);
+}
+.stat-value{
+  font-weight:900;
+  font-size:18px;
+  margin:6px 0;
+}
 .split{
   display:grid;
   grid-template-columns: 1fr;
@@ -214,6 +235,11 @@ textarea{min-height:92px;resize:vertical}
 }
 @media(min-width:380px){
   .split{grid-template-columns: 1fr 1fr;}
+}
+@media(min-width:420px){
+  .stat-grid{
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .badge{
@@ -481,6 +507,26 @@ textarea{min-height:92px;resize:vertical}
   --ios-radius: 18px;
 }
 
+html.theme-dark,
+body.theme-dark{
+  --ios-bg: #0b0b10;
+  --ios-card: rgba(28,28,30,.92);
+  --ios-sep: rgba(84,84,88,.55);
+  --ios-text: #f2f2f7;
+  --ios-muted: rgba(235,235,245,.6);
+  --ios-shadow: 0 12px 40px rgba(0,0,0,.4);
+}
+
+html.theme-light,
+body.theme-light{
+  --ios-bg: #f2f2f7;
+  --ios-card: rgba(255,255,255,.88);
+  --ios-sep: rgba(60,60,67,.16);
+  --ios-text: #111111;
+  --ios-muted: rgba(60,60,67,.60);
+  --ios-shadow: 0 10px 30px rgba(0,0,0,.08);
+}
+
 html, body{
   background: var(--ios-bg) !important;
   color: var(--ios-text) !important;
@@ -509,6 +555,9 @@ h1,h2,h3,h4{
   color: var(--ios-muted) !important;
 }
 
+.stat-card{
+  border-left: 4px solid var(--ios-blue) !important;
+}
 input, select, textarea{
   background: rgba(255,255,255,.95) !important;
   border: 1px solid var(--ios-sep) !important;
