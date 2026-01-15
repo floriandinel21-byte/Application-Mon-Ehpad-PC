@@ -1,17 +1,14 @@
-EHPAD Staff — Démo Web Locale (style app)
+# EHPAD – Base PC (imparfaite mais utilisable)
 
-✅ Compatible Windows / Mac / Linux
-✅ 100% local (aucun serveur)
-✅ Données de démo enregistrées dans localStorage
+- Style iOS + bleu #0A84FF
+- Navigation desktop (menu haut)
+- Écrans : Planning, Échanges, Messagerie, Absences (Du/Au), Heures sup, Profil & Santé, Direction, Contact
+- Démo : données stockées en localStorage
 
-Utilisation :
-1) Dézippe le dossier
-2) Ouvre index.html (double-clic)
-3) Choisis un rôle (Agent / Direction)
-4) Explore : Planning / Échanges / Messagerie / Profil & santé / Validations (direction)
+## Démarrer
+1) Dézippe
+2) Ouvre index.html dans ton navigateur
 
-Astuce :
-- Pour repartir à zéro : onglet Compte > Réinitialiser la démo.
-
-
-Mise à jour : calendrier en style iPhone (mois + sélection de jour + détails).
+## Notes
+Cette base sert à valider le rendu PC et la structure.
+Ensuite, on connecte aux vraies données/back-end.
