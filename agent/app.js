@@ -231,3 +231,73 @@ $('#newThread')?.addEventListener('click', ()=>{
 });
 renderThreads();
 renderChat();
+
+
+/* ----- Fiche médicale ----- */
+const medicalKey = 'ehpad_medical';
+function renderMedical(){
+  const data = store.get(medicalKey, null);
+  const prev = $('#medicalPreview');
+  if(!prev) return;
+
+  prev.innerHTML = '';
+  if(!data){
+    prev.innerHTML = `
+      <div><span>Statut</span><strong>Non renseignée</strong></div>
+      <div><span>Conseil</span><strong>Remplis la fiche à gauche</strong></div>
+    `;
+    return;
+  }
+
+  const rows = [
+    ['Groupe sanguin', data.blood],
+    ['Allergies', data.allergies],
+    ['Traitements', data.meds],
+    ['Antécédents', data.history],
+    ['Médecin', data.doctor],
+    ['Urgence', data.emergency],
+    ['Note', data.note],
+  ];
+
+  rows.forEach(([k,v])=>{
+    const el = document.createElement('div');
+    el.innerHTML = `<span>${k}</span><strong>${(v && String(v).trim()) ? String(v) : '—'}</strong>`;
+    prev.appendChild(el);
+  });
+
+  if($('#mBlood')) $('#mBlood').value = data.blood || '';
+  if($('#mAllergies')) $('#mAllergies').value = data.allergies || '';
+  if($('#mMeds')) $('#mMeds').value = data.meds || '';
+  if($('#mHistory')) $('#mHistory').value = data.history || '';
+  if($('#mDoctor')) $('#mDoctor').value = data.doctor || '';
+  if($('#mEmergency')) $('#mEmergency').value = data.emergency || '';
+  if($('#mNote')) $('#mNote').value = data.note || '';
+}
+
+$('#saveMedical')?.addEventListener('click', ()=>{
+  const data = {
+    blood: $('#mBlood')?.value || '',
+    allergies: $('#mAllergies')?.value || '',
+    meds: $('#mMeds')?.value || '',
+    history: $('#mHistory')?.value || '',
+    doctor: $('#mDoctor')?.value || '',
+    emergency: $('#mEmergency')?.value || '',
+    note: $('#mNote')?.value || '',
+    updatedAt: Date.now()
+  };
+  store.set(medicalKey, data);
+  if($('#medicalResult')) $('#medicalResult').textContent = 'Fiche enregistrée (démo).';
+  renderMedical();
+});
+
+$('#clearMedical')?.addEventListener('click', ()=>{
+  localStorage.removeItem(medicalKey);
+  if($('#medicalResult')) $('#medicalResult').textContent = 'Fiche effacée.';
+  ['#mBlood','#mAllergies','#mMeds','#mHistory','#mDoctor','#mEmergency','#mNote'].forEach(sel=>{
+    const el = $(sel);
+    if(el) el.value = '';
+  });
+  renderMedical();
+});
+
+renderMedical();

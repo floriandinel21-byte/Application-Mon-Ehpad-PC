@@ -1,7 +1,7 @@
 # EHPAD – Suite PC (Agent + Direction)
 
 Ce ZIP contient 2 applications PC (démo) :
-- /agent : interface Agent (planning, échanges, messagerie, absences Du/Au, heures sup, profil & santé, etc.)
+- /agent : interface Agent (planning, échanges, messagerie, absences Du/Au, heures sup, profil & santé + fiche médicale, etc.)
 - /direction : interface Direction (dashboard, validations, planning, agents, messagerie, paramètres, export CSV, audit)
 
 ## Démarrer
