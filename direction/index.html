@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EHPAD – Direction (Base PC)</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">D</div>
+      <div>
+        <div class="brand-title">EHPAD • Direction</div>
+        <div class="brand-sub">Base PC • style iOS</div>
+      </div>
+    </div>
+
+    <div class="right">
+      <div class="search">
+        <input id="q" placeholder="Rechercher (agent, unité, date…)" />
+      </div>
+      <button class="btn primary" id="exportBtn">Exporter (CSV)</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <button class="sbtn active" data-tab="dashboard">Tableau de bord</button>
+      <button class="sbtn" data-tab="planning">Planning</button>
+      <button class="sbtn" data-tab="validations">Validations</button>
+      <button class="sbtn" data-tab="absences">Absences</button>
+      <button class="sbtn" data-tab="agents">Agents</button>
+      <button class="sbtn" data-tab="messagerie">Messagerie</button>
+      <button class="sbtn" data-tab="parametres">Paramètres</button>
+      <button class="sbtn" data-tab="contact">Contact</button>
+    </aside>
+
+    <main class="content">
+      <section class="panel active" data-panel="dashboard">
+        <div class="panelhead">
+          <h1>Tableau de bord</h1>
+          <div class="chip">1920×1080</div>
+        </div>
+
+        <div class="kpis">
+          <div class="kpi"><div class="kpi-label">Échanges en attente</div><div class="kpi-value" id="kpiSwaps">0</div></div>
+          <div class="kpi"><div class="kpi-label">Absences déclarées</div><div class="kpi-value" id="kpiAbs">0</div></div>
+          <div class="kpi"><div class="kpi-label">Heures sup (mois)</div><div class="kpi-value" id="kpiOT">0 min</div></div>
+          <div class="kpi"><div class="kpi-label">Effectif (démo)</div><div class="kpi-value">24</div></div>
+        </div>
+
+        <div class="grid2">
+          <div class="card">
+            <div class="cardhead"><h2>Validations rapides</h2><div class="muted">Échanges + Absences</div></div>
+            <div class="list" id="quickValidations"></div>
+          </div>
+
+          <div class="card">
+            <div class="cardhead"><h2>Alertes</h2><div class="muted">Démo</div></div>
+            <div class="list" id="alerts"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="planning">
+        <div class="panelhead"><h1>Planning (unité)</h1><div class="chip">Création / modification</div></div>
+        <div class="grid2">
+          <div class="card">
+            <h2>Créer / modifier un poste</h2>
+            <div class="formgrid">
+              <label>Unité</label>
+              <select id="pUnit"><option>Unité A</option><option>Unité B</option><option>Unité C</option></select>
+              <label>Date</label><input type="date" id="pDate" />
+              <label>Agent</label><input id="pAgent" placeholder="Nom de l'agent" />
+              <label>Horaire</label>
+              <select id="pShift"><option>07:00–14:00</option><option>14:00–21:30</option><option>21:30–07:00</option></select>
+              <label>Note</label><input id="pNote" placeholder="Ex : renfort, formation…" />
+            </div>
+            <div class="actions">
+              <button class="btn primary" id="savePlanning">Enregistrer</button>
+              <div class="hint" id="planningResult"></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="cardhead"><h2>Planning enregistré</h2><div class="muted">Démo (local)</div></div>
+            <div class="list" id="planningList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="validations">
+        <div class="panelhead"><h1>Validations</h1><div class="chip">Accepter / Refuser</div></div>
+        <div class="grid2">
+          <div class="card"><h2>Échanges d’horaires</h2><div class="list" id="swapQueue"></div></div>
+          <div class="card"><h2>Absences</h2><div class="list" id="absenceQueue"></div></div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="absences">
+        <div class="panelhead"><h1>Absences</h1><div class="chip">Vue globale</div></div>
+        <div class="card">
+          <div class="cardhead"><h2>Liste</h2><div class="muted">Filtrable</div></div>
+          <div class="list" id="absenceAll"></div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="agents">
+        <div class="panelhead"><h1>Agents</h1><div class="chip">Annuaire</div></div>
+        <div class="grid2">
+          <div class="card">
+            <h2>Ajouter (démo)</h2>
+            <div class="formgrid">
+              <label>Nom</label><input id="aName" placeholder="Nom / prénom" />
+              <label>Rôle</label><input id="aRole" placeholder="AS, IDE…" />
+              <label>Unité</label><input id="aUnit" placeholder="Unité A" />
+              <label>Email</label><input id="aMail" placeholder="email@ehpad.fr" />
+            </div>
+            <div class="actions">
+              <button class="btn primary" id="addAgent">Ajouter</button>
+              <div class="hint" id="agentResult"></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="cardhead"><h2>Liste agents</h2><div class="muted">Démo</div></div>
+            <div class="list" id="agentList"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="messagerie">
+        <div class="panelhead"><h1>Messagerie (direction)</h1><div class="chip">Annonces / échanges</div></div>
+        <div class="grid2">
+          <div class="card">
+            <h2>Canaux</h2>
+            <div class="list" id="dirThreads"></div>
+            <button class="btn" id="newChannel">+ Nouveau canal</button>
+          </div>
+          <div class="card">
+            <h2 id="dirChatTitle">Canal</h2>
+            <div class="chat" id="dirChat"></div>
+            <div class="chatbar">
+              <input id="dirChatInput" type="text" placeholder="Écrire une annonce…" />
+              <input id="dirFileInput" type="file" />
+              <button class="btn primary" id="dirChatSend">Envoyer</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="parametres">
+        <div class="panelhead"><h1>Paramètres</h1><div class="chip">Rôles & visibilité</div></div>
+        <div class="grid2">
+          <div class="card">
+            <h2>Visibilité profil & santé</h2>
+            <div class="formgrid">
+              <label>La direction peut voir les données santé</label>
+              <select id="healthVisibility"><option value="no">Non</option><option value="yes">Oui</option></select>
+              <label>Note</label><input id="settingsNote" placeholder="Règles internes, RGPD, etc." />
+            </div>
+            <div class="actions">
+              <button class="btn primary" id="saveSettings">Enregistrer</button>
+              <div class="hint" id="settingsResult"></div>
+            </div>
+          </div>
+          <div class="card">
+            <h2>Audit (démo)</h2>
+            <div class="list" id="auditLog"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="panel" data-panel="contact">
+        <div class="panelhead"><h1>Contact EHPAD</h1><div class="chip">Infos</div></div>
+        <div class="grid2">
+          <div class="card">
+            <h2>Coordonnées</h2>
+            <div class="kv">
+              <div><span>Adresse</span><strong>À compléter</strong></div>
+              <div><span>Téléphone</span><strong>01 00 00 00 00</strong></div>
+              <div><span>Email</span><strong>contact@ehpad.fr</strong></div>
+            </div>
+          </div>
+          <div class="card"><h2>Notes</h2><p class="muted">Procédures, numéros utiles, etc.</p></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,233 @@
+// EHPAD – Base PC (imparfaite mais utilisable)
+const $ = (q, root=document) => root.querySelector(q);
+const $$ = (q, root=document) => Array.from(root.querySelectorAll(q));
+
+const store = {
+  get(key, fallback){
+    try{ return JSON.parse(localStorage.getItem(key)) ?? fallback; }
+    catch{ return fallback; }
+  },
+  set(key, value){ localStorage.setItem(key, JSON.stringify(value)); }
+};
+
+function setTab(tab){
+  $$('.navbtn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  $$('.panel').forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
+}
+$$('.navbtn').forEach(b => b.addEventListener('click', () => setTab(b.dataset.tab)));
+setTab('planning');
+
+(function buildCalendar(){
+  const cal = $('#calendar');
+  if(!cal) return;
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  const days = new Date(y, m+1, 0).getDate();
+  for(let d=1; d<=days; d++){
+    const el = document.createElement('div');
+    el.className = 'day' + (d===now.getDate() ? ' today' : '');
+    el.textContent = d;
+    cal.appendChild(el);
+  }
+})();
+
+const swapKey = 'ehpad_swaps';
+function renderSwaps(){
+  const list = $('#swapList');
+  const dir = $('#dirSwaps');
+  const swaps = store.get(swapKey, []);
+  const render = (root) => {
+    if(!root) return;
+    root.innerHTML = '';
+    if(swaps.length === 0){
+      root.innerHTML = '<div class="item"><div class="top">Aucune demande</div><div class="sub">Crée une demande à gauche.</div></div>';
+      return;
+    }
+    swaps.slice().reverse().forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'item';
+      item.innerHTML = `
+        <div class="top"><div>${s.date} • ${s.coworker || 'Collègue'}</div><div>${s.status}</div></div>
+        <div class="sub">Moi: <b>${s.my}</b> ⇄ Collègue: <b>${s.their}</b> — ${s.msg ? s.msg : '—'}</div>`;
+      root.appendChild(item);
+    });
+  };
+  render(list); render(dir);
+}
+$('#sendSwap')?.addEventListener('click', () => {
+  const date = $('#swapDate')?.value || '';
+  const my = $('#myShift')?.value || '';
+  const their = $('#theirShift')?.value || '';
+  const coworker = $('#coworker')?.value || '';
+  const msg = $('#swapMsg')?.value || '';
+  if(!date){ $('#swapResult').textContent = 'Choisis une date.'; return; }
+  const swaps = store.get(swapKey, []);
+  swaps.push({date, my, their, coworker, msg, status:'En attente'});
+  store.set(swapKey, swaps);
+  $('#swapResult').textContent = 'Demande envoyée (démo).';
+  renderSwaps();
+});
+renderSwaps();
+
+const absKey = 'ehpad_absences';
+function renderAbsences(){
+  const list = $('#absenceList');
+  const dir = $('#dirAbsences');
+  const abs = store.get(absKey, []);
+  const render = (root) => {
+    if(!root) return;
+    root.innerHTML='';
+    if(abs.length === 0){
+      root.innerHTML = '<div class="item"><div class="top">Aucune absence</div><div class="sub">Déclare une indisponibilité ou un arrêt.</div></div>';
+      return;
+    }
+    abs.slice().reverse().forEach(a => {
+      const item=document.createElement('div');
+      item.className='item';
+      item.innerHTML = `<div class="top"><div>${a.type}</div><div>${a.status}</div></div>
+        <div class="sub">Du <b>${a.from}</b> au <b>${a.to}</b> — ${a.note || '—'}</div>`;
+      root.appendChild(item);
+    });
+  };
+  render(list); render(dir);
+}
+$('#saveAbsence')?.addEventListener('click', () => {
+  const type = $('#absenceType')?.value || 'Indisponible';
+  const from = $('#fromDate')?.value || '';
+  const to = $('#toDate')?.value || '';
+  const note = $('#absenceNote')?.value || '';
+  if(!from || !to){ $('#absenceResult').textContent = 'Renseigne Du et Au.'; return; }
+  const abs = store.get(absKey, []);
+  abs.push({type, from, to, note, status:'Déclaré'});
+  store.set(absKey, abs);
+  $('#absenceResult').textContent = 'Enregistré (démo).';
+  renderAbsences();
+});
+renderAbsences();
+
+const otKey='ehpad_overtime';
+function renderOT(){
+  const list = $('#otList');
+  const ot = store.get(otKey, []);
+  if(!list) return;
+  list.innerHTML='';
+  if(ot.length===0){
+    list.innerHTML = '<div class="item"><div class="top">Aucune déclaration</div><div class="sub">Ajoute des minutes supplémentaires.</div></div>';
+    return;
+  }
+  ot.slice().reverse().forEach(o=>{
+    const item=document.createElement('div');
+    item.className='item';
+    item.innerHTML = `<div class="top"><div>${o.date}</div><div>${o.min} min</div></div><div class="sub">${o.note||'—'}</div>`;
+    list.appendChild(item);
+  });
+}
+$('#saveOT')?.addEventListener('click', ()=>{
+  const date = $('#otDate')?.value || '';
+  const min = Number($('#otMinutes')?.value || 0);
+  const note = $('#otNote')?.value || '';
+  if(!date || !min){ $('#otResult').textContent='Renseigne une date et des minutes.'; return; }
+  const ot = store.get(otKey, []);
+  ot.push({date, min, note});
+  store.set(otKey, ot);
+  $('#otResult').textContent='Enregistré (démo).';
+  renderOT();
+});
+renderOT();
+
+function saveProfile(){
+  const p = {name:$('#pName')?.value||'', unit:$('#pUnit')?.value||'', role:$('#pRole')?.value||''};
+  store.set('ehpad_profile', p);
+  $('#profileResult').textContent='Profil enregistré (démo).';
+}
+function saveHealth(){
+  const h = {allergies:$('#hAllergies')?.value||'', treatments:$('#hTreatments')?.value||'', weight:$('#hWeight')?.value||'', height:$('#hHeight')?.value||''};
+  store.set('ehpad_health', h);
+  $('#healthResult').textContent='Santé enregistrée (démo).';
+}
+$('#saveProfile')?.addEventListener('click', saveProfile);
+$('#saveHealth')?.addEventListener('click', saveHealth);
+
+(function loadProfile(){
+  const p = store.get('ehpad_profile', null);
+  if(p){
+    if($('#pName')) $('#pName').value = p.name||'';
+    if($('#pUnit')) $('#pUnit').value = p.unit||'';
+    if($('#pRole')) $('#pRole').value = p.role||'';
+  }
+  const h = store.get('ehpad_health', null);
+  if(h){
+    if($('#hAllergies')) $('#hAllergies').value = h.allergies||'';
+    if($('#hTreatments')) $('#hTreatments').value = h.treatments||'';
+    if($('#hWeight')) $('#hWeight').value = h.weight||'';
+    if($('#hHeight')) $('#hHeight').value = h.height||'';
+  }
+})();
+
+const msgKey='ehpad_msgs';
+function seed(){
+  const threads = store.get('ehpad_threads', null);
+  if(threads) return;
+  store.set('ehpad_threads', [{id:'t1', name:'Équipe Unité A'}]);
+  store.set(msgKey, {t1:[{me:false, text:'Bonjour, dispo pour un échange ?', ts:Date.now()-60000}]});
+}
+seed();
+
+let currentThread = 't1';
+function renderThreads(){
+  const root = $('#threads');
+  const threads = store.get('ehpad_threads', []);
+  if(!root) return;
+  root.innerHTML='';
+  threads.forEach(t=>{
+    const item=document.createElement('div');
+    item.className='item';
+    item.innerHTML = `<div class="top"><div>${t.name}</div><div>›</div></div><div class="sub">Clique pour ouvrir</div>`;
+    item.addEventListener('click', ()=>{
+      currentThread=t.id;
+      $('#chatTitle').textContent = t.name;
+      renderChat();
+    });
+    root.appendChild(item);
+  });
+}
+function renderChat(){
+  const root = $('#chat');
+  const all = store.get(msgKey, {});
+  const msgs = all[currentThread] || [];
+  if(!root) return;
+  root.innerHTML='';
+  msgs.forEach(m=>{
+    const b=document.createElement('div');
+    b.className='bubble' + (m.me?' me':'');
+    b.textContent = m.text;
+    root.appendChild(b);
+  });
+  root.scrollTop = root.scrollHeight;
+}
+$('#chatSend')?.addEventListener('click', ()=>{
+  const input = $('#chatInput');
+  const text = input?.value.trim();
+  if(!text) return;
+  const all = store.get(msgKey, {});
+  all[currentThread] = all[currentThread] || [];
+  all[currentThread].push({me:true, text, ts:Date.now()});
+  store.set(msgKey, all);
+  input.value='';
+  renderChat();
+});
+$('#newThread')?.addEventListener('click', ()=>{
+  const name = prompt('Nom de la conversation ?');
+  if(!name) return;
+  const threads = store.get('ehpad_threads', []);
+  const id = 't' + Math.random().toString(16).slice(2,8);
+  threads.push({id, name});
+  store.set('ehpad_threads', threads);
+  const all = store.get(msgKey, {});
+  all[id] = [];
+  store.set(msgKey, all);
+  renderThreads();
+});
+renderThreads();
+renderChat();
