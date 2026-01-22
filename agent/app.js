@@ -433,3 +433,59 @@ function makePicker({inputId, listId, chipsId, storageField, options}){
 // Init (profil & santé)
 makePicker({inputId:'allergySearch', listId:'allergyList', chipsId:'allergyChips', storageField:'allergies', options: ALLERGY_OPTIONS});
 makePicker({inputId:'treatmentSearch', listId:'treatmentList', chipsId:'treatmentChips', storageField:'treatments', options: TREATMENT_OPTIONS});
+
+
+/* ===== Maladies / Pathologies – recherche (démo) =====
+   NOTE : impossible de lister "toutes" les maladies existantes.
+   Ici : une base de suggestions courantes + ajout personnalisé.
+*/
+const DISEASE_OPTIONS = [
+  "Hypertension artérielle",
+  "Diabète de type 2",
+  "Asthme",
+  "BPCO (bronchopneumopathie chronique obstructive)",
+  "Insuffisance cardiaque",
+  "Fibrillation auriculaire",
+  "Coronaropathie",
+  "AVC (antécédent)",
+  "Epilepsie",
+  "Migraine",
+  "Dépression",
+  "Anxiété",
+  "Trouble bipolaire",
+  "Maladie d'Alzheimer",
+  "Maladie de Parkinson",
+  "Hypothyroïdie",
+  "Hyperthyroïdie",
+  "Insuffisance rénale chronique",
+  "Reflux gastro-œsophagien (RGO)",
+  "Ulcère gastroduodénal",
+  "Maladie cœliaque",
+  "Syndrome de l'intestin irritable",
+  "Polyarthrite rhumatoïde",
+  "Arthrose",
+  "Ostéoporose",
+  "Goutte",
+  "Cancer (antécédent)",
+  "Anémie",
+  "Apnée du sommeil",
+  "Hépatite (antécédent)",
+  "VIH",
+  "Tuberculose (antécédent)",
+  "Troubles de la coagulation",
+  "Trouble du rythme cardiaque",
+  "Allergie saisonnière (rhume des foins)"
+];
+
+// Init picker maladies (profil & santé)
+try{
+  makePicker({
+    inputId:'diseaseSearch',
+    listId:'diseaseList',
+    chipsId:'diseaseChips',
+    storageField:'diseases',
+    options: DISEASE_OPTIONS
+  });
+}catch(e){
+  // ignore if profil panel doesn't include the picker
+}

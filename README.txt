@@ -16,3 +16,4 @@ Ce ZIP contient 2 applications PC (démo) :
 
 ## Notes
 Base front-only. Pour un usage réel : comptes, back-end, base de données, RGPD, etc.
+- Profil & Santé : recherche + sélection maladies/pathologies (suggestions + ajout personnalisé)
