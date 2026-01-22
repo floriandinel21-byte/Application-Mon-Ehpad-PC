@@ -301,3 +301,135 @@ $('#clearMedical')?.addEventListener('click', ()=>{
 });
 
 renderMedical();
+
+
+/* ===== Allergies & Traitements – recherche (démo) =====
+   NOTE : impossible de lister "toutes" les allergies et "tous" les traitements existants.
+   Ici : une base de suggestions courantes + ajout personnalisé.
+*/
+const ALLERGY_OPTIONS = [
+  "Arachide","Fruits à coque (noix, amande, noisette)","Lait (protéines de lait)","Œuf","Poisson","Crustacés","Mollusques",
+  "Soja","Blé / gluten","Sésame","Moutarde","Céleri","Sulfites","Latex","Pollen (graminées)","Acariens","Poils d'animaux",
+  "Moisissures","Venin d'abeille","Venin de guêpe","Pénicilline","Amoxicilline","Céphalosporines","Aspirine / AINS",
+  "Iode / produits de contraste","Nickel","Parfum","Kiwi","Fraise","Tomate","Banane","Ananas"
+];
+
+const TREATMENT_OPTIONS = [
+  "Paracétamol","Ibuprofène (AINS)","Aspirine (AAS)","Amoxicilline","Amoxicilline / ac. clavulanique","Azithromycine",
+  "Ciprofloxacine","Metformine","Insuline","Atorvastatine","Simvastatine","Oméprazole (IPP)","Pantoprazole (IPP)",
+  "Lévothyroxine","Salbutamol (Ventoline)","Budesonide (corticoïde inhalé)","Prednisone","Dexaméthasone","Ramipril (IEC)",
+  "Amlodipine","Bisoprolol","Furosémide","Sertraline","Escitalopram","Diazépam","Lorazépam","Warfarine","Apixaban",
+  "Rivaroxaban","Clopidogrel","Tramadol","Morphine","Vitamine D","Fer (supplément)","Magnésium"
+];
+
+function normalize(s){ return (s||'').toLowerCase().normalize('NFD').replace(/\p{Diacritic}/gu,''); }
+
+function makePicker({inputId, listId, chipsId, storageField, options}){
+  const input = document.getElementById(inputId);
+  const list = document.getElementById(listId);
+  const chips = document.getElementById(chipsId);
+  if(!input || !list || !chips) return null;
+
+  function getHealth(){ return store.get('ehpad_health', {}) || {}; }
+  function setHealth(h){ store.set('ehpad_health', h); }
+
+  function getSelected(){
+    const h = getHealth();
+    return Array.isArray(h[storageField]) ? h[storageField] : [];
+  }
+  function setSelected(arr){
+    const h = getHealth();
+    h[storageField] = arr;
+    setHealth(h);
+  }
+
+  function syncLegacy(){
+    const h = getHealth();
+    const arr = Array.isArray(h[storageField]) ? h[storageField] : [];
+    if(storageField === 'allergies'){
+      const legacy = document.getElementById('hAllergies');
+      if(legacy) legacy.value = arr.join(', ');
+    }
+    if(storageField === 'treatments'){
+      const legacy = document.getElementById('hTreatments');
+      if(legacy) legacy.value = arr.join(', ');
+    }
+  }
+
+  function renderChips(){
+    const selected = getSelected();
+    chips.innerHTML = '';
+    selected.forEach((val, idx)=>{
+      const tag = document.createElement('span');
+      tag.className = 'chipTag';
+      tag.innerHTML = `<span>${val}</span><button title="Retirer">×</button>`;
+      tag.querySelector('button').addEventListener('click', ()=>{
+        const s = getSelected();
+        s.splice(idx, 1);
+        setSelected(s);
+        renderChips();
+        syncLegacy();
+      });
+      chips.appendChild(tag);
+    });
+  }
+
+  function renderList(query){
+    const q = normalize(query);
+    const selected = new Set(getSelected().map(x=>normalize(x)));
+    const results = options
+      .filter(x => q.length > 0 && normalize(x).includes(q))
+      .filter(x => !selected.has(normalize(x)))
+      .slice(0, 25);
+
+    list.innerHTML = '';
+    if(results.length === 0){ list.classList.remove('show'); return; }
+    results.forEach(val=>{
+      const it = document.createElement('div');
+      it.className = 'pickerItem';
+      it.textContent = val;
+      it.addEventListener('click', ()=>{
+        const s = getSelected();
+        s.push(val);
+        setSelected(s);
+        input.value = '';
+        list.classList.remove('show');
+        renderChips();
+        syncLegacy();
+      });
+      list.appendChild(it);
+    });
+    list.classList.add('show');
+  }
+
+  function addCustom(text){
+    const val = (text||'').trim();
+    if(!val) return;
+    const s = getSelected();
+    const exists = new Set(s.map(x=>normalize(x))).has(normalize(val));
+    if(exists) return;
+    s.push(val);
+    setSelected(s);
+    input.value = '';
+    list.classList.remove('show');
+    renderChips();
+    syncLegacy();
+  }
+
+  input.addEventListener('input', ()=> renderList(input.value));
+  input.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); addCustom(input.value); }
+    else if(e.key === 'Escape'){ list.classList.remove('show'); }
+  });
+  document.addEventListener('click', (e)=>{
+    if(!list.contains(e.target) && e.target !== input){ list.classList.remove('show'); }
+  });
+
+  renderChips();
+  syncLegacy();
+  return {renderChips, syncLegacy};
+}
+
+// Init (profil & santé)
+makePicker({inputId:'allergySearch', listId:'allergyList', chipsId:'allergyChips', storageField:'allergies', options: ALLERGY_OPTIONS});
+makePicker({inputId:'treatmentSearch', listId:'treatmentList', chipsId:'treatmentChips', storageField:'treatments', options: TREATMENT_OPTIONS});

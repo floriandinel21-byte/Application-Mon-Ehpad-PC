@@ -246,3 +246,43 @@ input:focus,select:focus,textarea:focus{
   .chatbar{grid-template-columns:1fr}
   .nav{justify-content:flex-start}
 }
+
+/* ---- Search pickers (Allergies / Traitements) ---- */
+.picker{display:grid; gap:10px}
+.pickerList{
+  display:none;
+  border:1px solid var(--sep);
+  background:rgba(255,255,255,.96);
+  border-radius:14px;
+  max-height:220px;
+  overflow:auto;
+  box-shadow:0 10px 28px rgba(0,0,0,.08);
+}
+.pickerList.show{display:block}
+.pickerItem{
+  padding:10px 12px;
+  cursor:pointer;
+  font-weight:800;
+  border-bottom:1px solid rgba(0,0,0,.06);
+}
+.pickerItem:last-child{border-bottom:0}
+.pickerItem:hover{background:rgba(10,132,255,.10)}
+.chips{display:flex; flex-wrap:wrap; gap:8px}
+.chipTag{
+  display:inline-flex; align-items:center; gap:8px;
+  padding:8px 10px;
+  border-radius:999px;
+  background:rgba(10,132,255,.10);
+  border:1px solid rgba(10,132,255,.18);
+  color:var(--blue);
+  font-weight:900;
+  font-size:12px;
+}
+.chipTag button{
+  border:0;
+  background:transparent;
+  cursor:pointer;
+  color:rgba(60,60,67,.60);
+  font-weight:900;
+  padding:0 2px;
+}
