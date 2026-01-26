@@ -489,3 +489,83 @@ try{
 }catch(e){
   // ignore if profil panel doesn't include the picker
 }
+
+
+/* ===== Profil & Santé -> Fiche médicale (verrouillage lecture seule) ===== */
+const lockedHealthKey = 'ehpad_locked_health_snapshot';
+
+function getArrayField(obj, key){
+  const v = obj?.[key];
+  if(Array.isArray(v)) return v;
+  if(typeof v === 'string' && v.trim()) return v.split(',').map(x=>x.trim()).filter(Boolean);
+  return [];
+}
+
+function lockProfileHealthToMedical(){
+  const profile = store.get('ehpad_profile', {}) || {};
+  const health = store.get('ehpad_health', {}) || {};
+
+  const snapshot = {
+    fullName: profile.name || profile.fullName || '',
+    role: profile.role || '',
+    unit: profile.unit || '',
+    allergies: getArrayField(health, 'allergies'),
+    treatments: getArrayField(health, 'treatments'),
+    diseases: getArrayField(health, 'diseases'),
+    weight: health.weight || '',
+    height: health.height || '',
+    updatedAt: Date.now()
+  };
+
+  store.set(lockedHealthKey, snapshot);
+  const hr = document.getElementById('healthResult');
+  if(hr) hr.textContent = 'Profil & Santé verrouillé dans la Fiche médicale.';
+  renderLockedHealth();
+}
+
+function renderLockedHealth(){
+  const root = document.getElementById('lockedHealthPreview');
+  if(!root) return;
+
+  const s = store.get(lockedHealthKey, null);
+  root.innerHTML = '';
+
+  if(!s){
+    root.innerHTML = `
+      <div><span>Statut</span><strong>Non verrouillé</strong></div>
+      <div><span>Action</span><strong>Profil & Santé → “Verrouiller…”</strong></div>
+    `;
+    return;
+  }
+
+  const rows = [
+    ['Nom', s.fullName || '—'],
+    ['Rôle', s.role || '—'],
+    ['Unité', s.unit || '—'],
+    ['Allergies', (s.allergies?.length ? s.allergies.join(', ') : '—')],
+    ['Traitements', (s.treatments?.length ? s.treatments.join(', ') : '—')],
+    ['Maladies', (s.diseases?.length ? s.diseases.join(', ') : '—')],
+    ['Poids', s.weight ? `${s.weight} kg` : '—'],
+    ['Taille', s.height ? `${s.height} cm` : '—'],
+    ['Dernière mise à jour', new Date(s.updatedAt).toLocaleString()]
+  ];
+
+  rows.forEach(([k,v])=>{
+    const el = document.createElement('div');
+    el.innerHTML = `<span>${k}</span><strong>${v}</strong>`;
+    root.appendChild(el);
+  });
+}
+
+document.getElementById('saveProfileHealthToMedical')?.addEventListener('click', ()=>{
+  lockProfileHealthToMedical();
+});
+
+document.getElementById('clearLockedHealth')?.addEventListener('click', ()=>{
+  localStorage.removeItem(lockedHealthKey);
+  const hr = document.getElementById('healthResult');
+  if(hr) hr.textContent = 'Verrouillage supprimé.';
+  renderLockedHealth();
+});
+
+renderLockedHealth();
