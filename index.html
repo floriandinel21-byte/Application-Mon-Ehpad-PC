@@ -1,85 +1,82 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>EHPAD – Suite PC</title>
-  <style>
-    :root{ --blue:#0A84FF; --bg:#F2F2F7; --sep:rgba(60,60,67,.16); --muted:rgba(60,60,67,.60); }
-    *{box-sizing:border-box}
-    body{
-      margin:0; min-height:100vh; display:grid; place-items:center;
-      background:var(--bg);
-      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI",Roboto,Arial,sans-serif;
-      color:#111;
-    }
-    .card{
-      width:min(840px, 92vw);
-      padding:22px;
-      border-radius:22px;
-      background:rgba(255,255,255,.86);
-      border:1px solid var(--sep);
-      box-shadow:0 18px 44px rgba(0,0,0,.10);
-      backdrop-filter: blur(18px);
-      -webkit-backdrop-filter: blur(18px);
-    }
-    h1{margin:0 0 6px; letter-spacing:-.02em}
-    p{margin:0 0 18px; color:var(--muted); font-weight:700}
-    .grid{display:grid; grid-template-columns:1fr 1fr; gap:14px}
-    a.btn{
-      text-decoration:none;
-      display:flex; align-items:center; justify-content:space-between;
-      padding:16px 16px;
-      border-radius:18px;
-      border:1px solid var(--sep);
-      background:rgba(255,255,255,.92);
-      font-weight:900;
-      color:#111;
-    }
-    a.btn:hover{border-color:rgba(10,132,255,.35)}
-    .badge{
-      padding:6px 10px; border-radius:999px;
-      font-size:12px; font-weight:900;
-      border:1px solid rgba(10,132,255,.18);
-      background:rgba(10,132,255,.10);
-      color:var(--blue);
-    }
-    .note{
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:16px;
-      border:1px solid var(--sep);
-      background:rgba(255,255,255,.78);
-      color:var(--muted);
-      font-weight:700;
-      font-size:12px;
-      line-height:1.4;
-    }
-    @media (max-width: 760px){
-      .grid{grid-template-columns:1fr}
-    }
-  </style>
+<meta charset="UTF-8">
+<title>EHPAD Suite PC</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="card">
-    <h1>EHPAD – Suite PC</h1>
-    <p>Sélectionne un mode. (Démo locale, sans serveur)</p>
 
-    <div class="grid">
-      <a class="btn" href="./agent/index.html">
-        <span>Mode Agent</span>
-        <span class="badge">Planning • Échanges • Messagerie</span>
-      </a>
-      <a class="btn" href="./direction/index.html">
-        <span>Mode Direction</span>
-        <span class="badge">Dashboard • Validations • Export</span>
-      </a>
-    </div>
+<header class="topbar">
+<div class="logo">EHPAD Suite</div>
+<nav>
+<button class="navbtn" data-tab="dashboard">Dashboard</button>
+<button class="navbtn" data-tab="planning">Planning</button>
+<button class="navbtn" data-tab="residents">Résidents</button>
+<button class="navbtn" data-tab="profil">Profil & Santé</button>
+<button class="navbtn" data-tab="fiche">Fiche Médicale</button>
+<button class="navbtn" data-tab="direction">Direction</button>
+</nav>
+</header>
 
-    <div class="note">
-      Astuce : les données sont stockées en <b>localStorage</b>. Les validations direction changent l’état des échanges/absences.
-      Tu peux ouvrir Agent + Direction dans deux onglets pour tester le flux.
-    </div>
-  </div>
+<main>
+
+<section id="dashboard" class="tab active">
+<h1>Dashboard</h1>
+<div class="card">Bienvenue dans la version PC.</div>
+</section>
+
+<section id="planning" class="tab">
+<h1>Planning</h1>
+
+<h2>Calendrier mensuel</h2>
+<div id="calendar"></div>
+
+<h2>Planning agents</h2>
+<table>
+<tr><th>Agent</th><th>Matin</th><th>Après‑midi</th><th>Nuit</th></tr>
+<tr><td>Dupont</td><td>✔</td><td></td><td></td></tr>
+<tr><td>Martin</td><td></td><td>✔</td><td>✔</td></tr>
+</table>
+</section>
+
+<section id="residents" class="tab">
+<h1>Résidents</h1>
+<div class="card">Liste des résidents (démo).</div>
+</section>
+
+<section id="profil" class="tab">
+<h1>Profil & Santé</h1>
+
+<input id="allergyInput" placeholder="Ajouter allergie">
+<button onclick="addItem('allergies')">Ajouter</button>
+<ul id="allergies"></ul>
+
+<input id="treatInput" placeholder="Ajouter traitement">
+<button onclick="addItem('treatments')">Ajouter</button>
+<ul id="treatments"></ul>
+
+<input id="diseaseInput" placeholder="Ajouter maladie">
+<button onclick="addItem('diseases')">Ajouter</button>
+<ul id="diseases"></ul>
+
+<br><br>
+<button onclick="saveHealth()">Enregistrer vers fiche médicale</button>
+
+</section>
+
+<section id="fiche" class="tab">
+<h1>Fiche Médicale</h1>
+<div id="medicalView"></div>
+</section>
+
+<section id="direction" class="tab">
+<h1>Direction</h1>
+<div class="card">Espace direction.</div>
+</section>
+
+</main>
+
+<script src="app.js"></script>
 </body>
 </html>
