@@ -2,68 +2,73 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>EHPAD Suite Pro</title>
+<title>EHPAD PRO</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <header class="topbar">
-  <div class="logo">EHPAD Suite Pro</div>
-  <nav>
-    <button class="navbtn active" data-tab="dashboard">Dashboard</button>
-    <button class="navbtn" data-tab="planning">Planning</button>
-    <button class="navbtn" data-tab="profil">Profil & Santé</button>
-    <button class="navbtn" data-tab="fiche">Fiche Médicale</button>
-  </nav>
+<div>EHPAD PRO</div>
+<nav>
+<button onclick="show('dashboard')">Dashboard</button>
+<button onclick="show('planning')">Planning</button>
+<button onclick="show('conges')">Congés</button>
+<button onclick="show('profil')">Profil & Santé</button>
+<button onclick="show('fiche')">Fiche médicale</button>
+</nav>
 </header>
 
 <main>
 
 <section id="dashboard" class="tab active">
-  <h1>Dashboard</h1>
-  <div class="grid">
-    <div class="card">👥 Résidents<br><b>24</b></div>
-    <div class="card">🧑‍⚕️ Agents<br><b>12</b></div>
-    <div class="card">📅 Planning<br><b>OK</b></div>
-  </div>
+<h1>Dashboard</h1>
+<div class="card">Logiciel médical version PRO</div>
 </section>
 
 <section id="planning" class="tab">
-  <h1>Planning</h1>
-  <div id="calendar"></div>
+<h1>Planning</h1>
+
+<input id="agent" placeholder="Nom agent">
+<input id="date" type="date">
+<select id="shift">
+<option>Matin</option>
+<option>Après-midi</option>
+<option>Nuit</option>
+</select>
+<button onclick="addPlanning()">Ajouter</button>
+
+<ul id="planningList"></ul>
+</section>
+
+<section id="conges" class="tab">
+<h1>Demandes</h1>
+
+<input id="nomDemande" placeholder="Nom">
+<select id="typeDemande">
+<option>Congé</option>
+<option>Arrêt maladie</option>
+</select>
+<input type="date" id="dateDebut">
+<input type="date" id="dateFin">
+<button onclick="addDemande()">Envoyer</button>
+
+<ul id="demandeList"></ul>
 </section>
 
 <section id="profil" class="tab">
-  <h1>Profil & Santé</h1>
+<h1>Profil & Santé</h1>
 
-  <div class="card">
-    <h2>Allergies</h2>
-    <input id="allergyInput" placeholder="Ajouter..." />
-    <button onclick="addItem('allergies')">+</button>
-    <div id="allergies" class="chips"></div>
-  </div>
+<input id="search" placeholder="Ajouter maladie / allergie / traitement">
+<button onclick="addHealth()">Ajouter</button>
 
-  <div class="card">
-    <h2>Traitements</h2>
-    <input id="treatInput" placeholder="Ajouter..." />
-    <button onclick="addItem('treatments')">+</button>
-    <div id="treatments" class="chips"></div>
-  </div>
+<div id="healthList"></div>
 
-  <div class="card">
-    <h2>Maladies</h2>
-    <input id="diseaseInput" placeholder="Ajouter..." />
-    <button onclick="addItem('diseases')">+</button>
-    <div id="diseases" class="chips"></div>
-  </div>
-
-  <button class="save" onclick="saveHealth()">Enregistrer</button>
-
+<button onclick="saveHealth()">Enregistrer</button>
 </section>
 
 <section id="fiche" class="tab">
-  <h1>Fiche Médicale</h1>
-  <div id="medicalView" class="card"></div>
+<h1>Fiche médicale</h1>
+<div id="ficheData"></div>
 </section>
 
 </main>
