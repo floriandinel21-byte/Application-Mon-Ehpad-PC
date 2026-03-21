@@ -2,77 +2,68 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>EHPAD Suite PC</title>
+<title>EHPAD Suite Pro</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
 <header class="topbar">
-<div class="logo">EHPAD Suite</div>
-<nav>
-<button class="navbtn" data-tab="dashboard">Dashboard</button>
-<button class="navbtn" data-tab="planning">Planning</button>
-<button class="navbtn" data-tab="residents">Résidents</button>
-<button class="navbtn" data-tab="profil">Profil & Santé</button>
-<button class="navbtn" data-tab="fiche">Fiche Médicale</button>
-<button class="navbtn" data-tab="direction">Direction</button>
-</nav>
+  <div class="logo">EHPAD Suite Pro</div>
+  <nav>
+    <button class="navbtn active" data-tab="dashboard">Dashboard</button>
+    <button class="navbtn" data-tab="planning">Planning</button>
+    <button class="navbtn" data-tab="profil">Profil & Santé</button>
+    <button class="navbtn" data-tab="fiche">Fiche Médicale</button>
+  </nav>
 </header>
 
 <main>
 
 <section id="dashboard" class="tab active">
-<h1>Dashboard</h1>
-<div class="card">Bienvenue dans la version PC.</div>
+  <h1>Dashboard</h1>
+  <div class="grid">
+    <div class="card">👥 Résidents<br><b>24</b></div>
+    <div class="card">🧑‍⚕️ Agents<br><b>12</b></div>
+    <div class="card">📅 Planning<br><b>OK</b></div>
+  </div>
 </section>
 
 <section id="planning" class="tab">
-<h1>Planning</h1>
-
-<h2>Calendrier mensuel</h2>
-<div id="calendar"></div>
-
-<h2>Planning agents</h2>
-<table>
-<tr><th>Agent</th><th>Matin</th><th>Après‑midi</th><th>Nuit</th></tr>
-<tr><td>Dupont</td><td>✔</td><td></td><td></td></tr>
-<tr><td>Martin</td><td></td><td>✔</td><td>✔</td></tr>
-</table>
-</section>
-
-<section id="residents" class="tab">
-<h1>Résidents</h1>
-<div class="card">Liste des résidents (démo).</div>
+  <h1>Planning</h1>
+  <div id="calendar"></div>
 </section>
 
 <section id="profil" class="tab">
-<h1>Profil & Santé</h1>
+  <h1>Profil & Santé</h1>
 
-<input id="allergyInput" placeholder="Ajouter allergie">
-<button onclick="addItem('allergies')">Ajouter</button>
-<ul id="allergies"></ul>
+  <div class="card">
+    <h2>Allergies</h2>
+    <input id="allergyInput" placeholder="Ajouter..." />
+    <button onclick="addItem('allergies')">+</button>
+    <div id="allergies" class="chips"></div>
+  </div>
 
-<input id="treatInput" placeholder="Ajouter traitement">
-<button onclick="addItem('treatments')">Ajouter</button>
-<ul id="treatments"></ul>
+  <div class="card">
+    <h2>Traitements</h2>
+    <input id="treatInput" placeholder="Ajouter..." />
+    <button onclick="addItem('treatments')">+</button>
+    <div id="treatments" class="chips"></div>
+  </div>
 
-<input id="diseaseInput" placeholder="Ajouter maladie">
-<button onclick="addItem('diseases')">Ajouter</button>
-<ul id="diseases"></ul>
+  <div class="card">
+    <h2>Maladies</h2>
+    <input id="diseaseInput" placeholder="Ajouter..." />
+    <button onclick="addItem('diseases')">+</button>
+    <div id="diseases" class="chips"></div>
+  </div>
 
-<br><br>
-<button onclick="saveHealth()">Enregistrer vers fiche médicale</button>
+  <button class="save" onclick="saveHealth()">Enregistrer</button>
 
 </section>
 
 <section id="fiche" class="tab">
-<h1>Fiche Médicale</h1>
-<div id="medicalView"></div>
-</section>
-
-<section id="direction" class="tab">
-<h1>Direction</h1>
-<div class="card">Espace direction.</div>
+  <h1>Fiche Médicale</h1>
+  <div id="medicalView" class="card"></div>
 </section>
 
 </main>
