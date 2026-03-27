@@ -1,78 +1,1752 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>EHPAD PRO</title>
-<link rel="stylesheet" href="styles.css">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>EHPAD Staff — Bureau</title>
+<style>
+/* ── Variables ───────────────────────────────────────────────────────────── */
+:root {
+  --bg:       #07101f;
+  --surface:  #0d1929;
+  --card:     #111f35;
+  --card2:    #0f1b2f;
+  --border:   rgba(255,255,255,.08);
+  --text:     #e8f0ff;
+  --muted:    #7a90b5;
+  --primary:  #3d7fff;
+  --primary2: #2560d8;
+  --success:  #28c76f;
+  --danger:   #ff4757;
+  --warn:     #ffb830;
+  --purple:   #9b59f7;
+  --orange:   #ff8c42;
+  --radius:   12px;
+  --sidebar:  240px;
+  --shadow:   0 8px 32px rgba(0,0,0,.4);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: #07101f;
+  color: var(--text);
+  font-size: 14px;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+.layout { display:flex; height:100vh; }
+
+/* ── Sidebar ─────────────────────────────────────────────────────────────── */
+.sidebar {
+  width: var(--sidebar);
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.sidebar-brand {
+  padding: 20px 16px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-bottom: 1px solid var(--border);
+}
+.sidebar-logo {
+  width: 36px; height: 36px; border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  display: grid; place-items: center;
+  font-weight: 900; font-size: 16px; flex-shrink: 0;
+}
+.sidebar-title { font-weight: 800; font-size: 15px; }
+.sidebar-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+
+.sidebar-nav { flex: 1; padding: 12px 8px; overflow-y: auto; }
+.nav-section { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .8px; padding: 12px 8px 6px; }
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 10px; border-radius: 8px;
+  color: var(--muted); cursor: pointer;
+  transition: all .15s; position: relative;
+  margin-bottom: 2px; font-size: 13px; font-weight: 500;
+}
+.nav-item:hover { background: rgba(255,255,255,.04); color: var(--text); }
+.nav-item.active { background: rgba(61,127,255,.15); color: var(--text); }
+.nav-item.active::before {
+  content: '';
+  position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+  width: 3px; height: 18px; background: var(--primary); border-radius: 0 3px 3px 0;
+}
+.nav-item svg { width: 17px; height: 17px; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto; background: var(--danger);
+  color: #fff; font-size: 10px; font-weight: 800;
+  padding: 2px 6px; border-radius: 999px; min-width: 18px; text-align: center;
+}
+
+.sidebar-user {
+  padding: 12px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 10px;
+}
+.user-avatar {
+  width: 34px; height: 34px; border-radius: 10px;
+  display: grid; place-items: center;
+  font-weight: 900; font-size: 13px; flex-shrink: 0;
+}
+.user-name { font-weight: 700; font-size: 13px; }
+.user-role { font-size: 11px; color: var(--muted); }
+.sidebar-user .btn-logout {
+  margin-left: auto; padding: 5px 8px; border-radius: 7px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--muted); cursor: pointer; font-size: 11px;
+  transition: all .15s;
+}
+.sidebar-user .btn-logout:hover { color: var(--danger); border-color: var(--danger); }
+
+/* ── Main area ───────────────────────────────────────────────────────────── */
+.main-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: radial-gradient(900px 600px at 80% -20%, rgba(61,127,255,.12), transparent 60%),
+              radial-gradient(700px 500px at 0% 100%, rgba(40,199,111,.08), transparent 55%),
+              var(--bg);
+}
+
+.topbar {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--border);
+  background: rgba(13,25,41,.8);
+  backdrop-filter: blur(10px);
+  flex-shrink: 0;
+}
+.topbar-left { display: flex; align-items: center; gap: 12px; }
+.topbar-title { font-size: 18px; font-weight: 800; }
+.topbar-sub { font-size: 12px; color: var(--muted); }
+.topbar-right { display: flex; align-items: center; gap: 10px; }
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+}
+
+/* ── Login screen ────────────────────────────────────────────────────────── */
+.login-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(900px 600px at 20% -10%, rgba(61,127,255,.25), transparent 60%),
+              radial-gradient(700px 500px at 110% 80%, rgba(40,199,111,.18), transparent 55%),
+              var(--bg);
+}
+.login-card {
+  width: 460px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  box-shadow: var(--shadow);
+}
+.login-logo {
+  width: 52px; height: 52px; border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary), var(--primary2));
+  display: grid; place-items: center;
+  font-weight: 900; font-size: 22px;
+  margin: 0 auto 16px;
+  box-shadow: 0 8px 24px rgba(61,127,255,.4);
+}
+.login-title { font-size: 24px; font-weight: 900; text-align: center; margin-bottom: 6px; }
+.login-sub { font-size: 13px; color: var(--muted); text-align: center; margin-bottom: 28px; }
+
+.avatar-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 10px;
+  margin: 16px 0;
+}
+.avatar-chip {
+  display: flex; flex-direction: column; align-items: center; gap: 7px;
+  padding: 12px 8px; border-radius: 12px;
+  border: 1px solid var(--border); background: rgba(255,255,255,.02);
+  cursor: pointer; transition: all .15s; font-size: 12px; color: var(--muted);
+  text-align: center;
+}
+.avatar-chip:hover { background: rgba(255,255,255,.05); }
+.avatar-chip.active { background: rgba(61,127,255,.12); border-color: rgba(61,127,255,.5); color: var(--text); }
+.avatar-circle {
+  width: 44px; height: 44px; border-radius: 13px;
+  display: grid; place-items: center;
+  font-weight: 900; font-size: 16px; color: #fff;
+}
+
+/* ── Shared components ───────────────────────────────────────────────────── */
+.btn {
+  padding: 9px 16px; border-radius: 9px; border: 1px solid var(--border);
+  background: rgba(255,255,255,.05); color: var(--text);
+  font-weight: 700; cursor: pointer; font-size: 13px;
+  transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+}
+.btn:hover { background: rgba(255,255,255,.09); }
+.btn.primary { background: linear-gradient(135deg, var(--primary), var(--primary2)); border: none; }
+.btn.primary:hover { filter: brightness(1.1); }
+.btn.danger { background: linear-gradient(135deg, var(--danger), #e8303f); border: none; }
+.btn.ghost { background: transparent; }
+.btn.sm { padding: 6px 11px; font-size: 12px; border-radius: 7px; }
+.btn.full { width: 100%; justify-content: center; margin-top: 8px; }
+
+.field { display: flex; flex-direction: column; gap: 6px; }
+label { font-size: 12px; color: var(--muted); font-weight: 600; }
+input, select, textarea {
+  width: 100%; padding: 10px 12px; border-radius: 9px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  color: var(--text); outline: none; font-size: 13px; min-width: 0;
+  box-sizing: border-box;
+}
+input:focus, select:focus, textarea:focus { border-color: rgba(61,127,255,.5); }
+textarea { min-height: 80px; resize: vertical; }
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+}
+.card-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
+.card-sub { font-size: 12px; color: var(--muted); }
+.hr { height: 1px; background: var(--border); margin: 14px 0; }
+.muted { color: var(--muted); font-size: 12px; }
+.section-title { font-weight: 700; font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .5px; margin-bottom: 10px; }
+
+.badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  border: 1px solid var(--border); color: var(--muted);
+}
+.badge.ok { border-color: rgba(40,199,111,.35); background: rgba(40,199,111,.1); color: #7efbba; }
+.badge.warn { border-color: rgba(255,184,48,.35); background: rgba(255,184,48,.1); color: #ffe08a; }
+.badge.no { border-color: rgba(255,71,87,.35); background: rgba(255,71,87,.1); color: #ffb3ba; }
+
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+  border: 1px solid var(--border); width: fit-content;
+}
+.tag.matin { border-color: rgba(61,127,255,.4); color: #b8d0ff; background: rgba(61,127,255,.12); }
+.tag.soir  { border-color: rgba(255,140,66,.4); color: #ffd4b0; background: rgba(255,140,66,.12); }
+.tag.night { border-color: rgba(155,89,247,.4); color: #d9c0ff; background: rgba(155,89,247,.12); }
+.tag.journee{ border-color: rgba(255,184,48,.4); color: #ffe8a0; background: rgba(255,184,48,.12); }
+
+/* ── KPIs ────────────────────────────────────────────────────────────────── */
+.kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+.kpi-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 18px 20px;
+  display: flex; align-items: center; gap: 16px;
+}
+.kpi-icon {
+  width: 44px; height: 44px; border-radius: 12px;
+  display: grid; place-items: center; flex-shrink: 0;
+}
+.kpi-icon svg { width: 22px; height: 22px; }
+.kpi-val { font-size: 26px; font-weight: 900; line-height: 1; }
+.kpi-label { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+/* ── Grid layouts ────────────────────────────────────────────────────────── */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+.grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 18px; }
+.grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 18px; }
+.col-stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* ── Calendar (desktop large) ────────────────────────────────────────────── */
+.cal-wrap { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; }
+.cal-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,.02);
+}
+.cal-title { font-size: 16px; font-weight: 900; }
+.cal-controls { display: flex; align-items: center; gap: 10px; }
+.cal-nav-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: 1px solid var(--border); background: rgba(255,255,255,.04);
+  display: grid; place-items: center; cursor: pointer; color: var(--text);
+}
+.cal-nav-btn svg { width: 16px; height: 16px; }
+.unit-tabs { display: flex; gap: 6px; }
+.unit-tab {
+  padding: 5px 12px; border-radius: 7px; font-size: 12px; font-weight: 700;
+  border: 1px solid var(--border); background: rgba(255,255,255,.03);
+  color: var(--muted); cursor: pointer; transition: all .15s;
+}
+.unit-tab.active { background: rgba(61,127,255,.15); border-color: rgba(61,127,255,.5); color: var(--text); }
+.cal-dow {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  padding: 10px 16px 6px; font-size: 11px; font-weight: 700;
+  color: var(--muted); text-transform: uppercase; letter-spacing: .5px;
+  border-bottom: 1px solid var(--border);
+}
+.cal-grid {
+  display: grid; grid-template-columns: repeat(7,1fr);
+  gap: 1px; background: var(--border);
+}
+.cal-cell {
+  background: var(--card); padding: 10px 8px;
+  min-height: 90px; cursor: pointer; transition: background .1s;
+  position: relative;
+}
+.cal-cell:hover { background: rgba(255,255,255,.03); }
+.cal-cell.off { opacity: .4; cursor: default; }
+.cal-cell.today { background: rgba(61,127,255,.1); }
+.cal-cell.sel { outline: 2px solid rgba(40,199,111,.6); outline-offset: -2px; }
+.cal-num {
+  font-size: 13px; font-weight: 800;
+  display: inline-flex; width: 26px; height: 26px; border-radius: 8px;
+  align-items: center; justify-content: center;
+}
+.cal-cell.today .cal-num { background: var(--primary); color: #fff; }
+.cal-weekend .cal-num { color: rgba(255,120,120,.9); }
+.cal-shifts { display: flex; flex-direction: column; gap: 3px; margin-top: 4px; }
+.cal-shift-pill {
+  font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 5px;
+  display: flex; align-items: center; gap: 4px; white-space: nowrap; overflow: hidden;
+}
+.cal-shift-pill.matin  { background: rgba(61,127,255,.18); color: #b8d0ff; }
+.cal-shift-pill.soir   { background: rgba(255,140,66,.18); color: #ffd4b0; }
+.cal-shift-pill.night  { background: rgba(155,89,247,.18); color: #d9c0ff; }
+.cal-shift-pill.journee{ background: rgba(255,184,48,.18); color: #ffe8a0; }
+.cal-shift-pill.mine   { outline: 1px solid rgba(255,255,255,.4); }
+
+/* Day detail panel */
+.day-panel {
+  background: var(--card2); border-top: 1px solid var(--border);
+  padding: 16px 20px;
+}
+.day-panel-title { font-size: 14px; font-weight: 800; margin-bottom: 12px; }
+.day-panel-shifts { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; }
+.day-shift-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 10px; padding: 12px;
+}
+.day-shift-time { font-size: 15px; font-weight: 900; }
+.day-shift-agent { font-size: 12px; color: var(--muted); margin-top: 3px; }
+
+/* ── Week view ───────────────────────────────────────────────────────────── */
+.week-wrap { overflow: hidden; }
+.week-head {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+}
+.week-grid {
+  display: grid; grid-template-columns: 80px repeat(7,1fr);
+  gap: 0;
+}
+.week-col-head {
+  padding: 10px 8px; text-align: center; font-size: 11px; font-weight: 700;
+  color: var(--muted); border-bottom: 1px solid var(--border);
+  border-right: 1px solid var(--border);
+}
+.week-col-head.today { color: var(--primary); }
+.week-col-head span { display: block; font-size: 18px; font-weight: 900; color: var(--text); }
+.week-col-head.today span { color: var(--primary); }
+.week-row-label {
+  padding: 8px; font-size: 10px; color: var(--muted);
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  text-align: center;
+}
+.week-cell {
+  border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+  padding: 6px; min-height: 60px;
+}
+.week-event {
+  font-size: 11px; font-weight: 700; padding: 4px 7px; border-radius: 6px;
+  margin-bottom: 3px; display: flex; align-items: center; gap: 4px;
+  cursor: pointer;
+}
+.week-event.matin   { background: rgba(61,127,255,.2); color: #b8d0ff; }
+.week-event.soir    { background: rgba(255,140,66,.2); color: #ffd4b0; }
+.week-event.night   { background: rgba(155,89,247,.2); color: #d9c0ff; }
+.week-event.journee { background: rgba(255,184,48,.2); color: #ffe8a0; }
+.week-event.mine    { outline: 1.5px solid rgba(255,255,255,.5); }
+
+/* ── Agent list ──────────────────────────────────────────────────────────── */
+.agent-row {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: rgba(255,255,255,.02);
+  margin-bottom: 8px; transition: background .1s;
+}
+.agent-row:hover { background: rgba(255,255,255,.04); }
+.agent-avatar {
+  width: 36px; height: 36px; border-radius: 10px;
+  display: grid; place-items: center; font-weight: 900; font-size: 13px;
+  flex-shrink: 0;
+}
+.agent-name { font-weight: 750; font-size: 13px; }
+.agent-unit { font-size: 11px; color: var(--muted); }
+
+/* ── Validation cards ────────────────────────────────────────────────────── */
+.val-card {
+  background: var(--card2); border: 1px solid var(--border);
+  border-radius: 10px; padding: 14px; margin-bottom: 10px;
+}
+.val-card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+.val-card-title { font-weight: 800; font-size: 13px; }
+.val-card-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+.val-actions { display: flex; gap: 8px; margin-top: 10px; }
+
+/* ── Chat ────────────────────────────────────────────────────────────────── */
+.chat-layout { display: flex; height: calc(100vh - 56px - 48px); gap: 0; }
+.chat-sidebar {
+  width: 260px; border-right: 1px solid var(--border);
+  display: flex; flex-direction: column; flex-shrink: 0;
+}
+.chat-list { flex: 1; overflow-y: auto; padding: 8px; }
+.chat-peer-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border-radius: 10px; cursor: pointer;
+  transition: background .1s; margin-bottom: 4px;
+}
+.chat-peer-item:hover { background: rgba(255,255,255,.04); }
+.chat-peer-item.active { background: rgba(61,127,255,.12); }
+.chat-peer-avatar {
+  width: 38px; height: 38px; border-radius: 11px;
+  display: grid; place-items: center; font-weight: 900; font-size: 14px; flex-shrink: 0;
+}
+.chat-peer-name { font-weight: 700; font-size: 13px; }
+.chat-peer-unit { font-size: 11px; color: var(--muted); }
+.chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.chat-head {
+  padding: 14px 20px; border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,.02); display: flex; align-items: center; gap: 12px;
+}
+.chat-messages { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.bubble {
+  max-width: 62%; padding: 10px 14px; border-radius: 14px;
+  border: 1px solid var(--border); background: rgba(255,255,255,.04);
+  font-size: 13px; line-height: 1.5;
+}
+.bubble.me {
+  margin-left: auto; background: rgba(61,127,255,.15);
+  border-color: rgba(61,127,255,.35);
+}
+.bubble-time { font-size: 10px; color: var(--muted); margin-top: 5px; }
+.chat-empty-state {
+  flex: 1; display: flex; flex-direction: column; align-items: center;
+  justify-content: center; gap: 10px; color: var(--muted);
+}
+.chat-empty-state svg { width: 40px; height: 40px; opacity: .3; }
+.chatbar-desktop {
+  padding: 12px 20px; border-top: 1px solid var(--border);
+  display: flex; gap: 10px; background: rgba(13,25,41,.9);
+}
+.chatbar-desktop input { flex: 1; }
+
+/* ── Profile form ────────────────────────────────────────────────────────── */
+.grid-form-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.tag-picker-wrap { position: relative; }
+.tag-picker-search {
+  width: 100%; padding: 10px 12px; border-radius: 9px;
+  background: rgba(255,255,255,.04); border: 1px solid var(--border);
+  color: var(--text); outline: none; font-size: 13px; box-sizing: border-box;
+}
+.tag-picker-search:focus { border-color: rgba(61,127,255,.5); }
+.tag-suggestions {
+  position: absolute; top: calc(100%+6px); left: 0; right: 0; z-index: 200;
+  background: #0d1929; border: 1px solid rgba(61,127,255,.35);
+  border-radius: 10px; list-style: none; padding: 4px 0;
+  box-shadow: 0 16px 40px rgba(0,0,0,.6); max-height: 220px; overflow-y: auto;
+}
+.tag-suggestions li { padding: 9px 14px; font-size: 13px; cursor: pointer; color: var(--text); }
+.tag-suggestions li:hover { background: rgba(61,127,255,.15); }
+.tag-suggestions.hidden { display: none; }
+.tag-sel-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.tag-sel-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 10px; border-radius: 999px; font-size: 12px; font-weight: 700;
+  background: rgba(61,127,255,.15); border: 1px solid rgba(61,127,255,.4); color: #b8d0ff;
+}
+.tag-sel-chip .rm {
+  cursor: pointer; opacity: .6; font-size: 10px;
+  background: rgba(255,255,255,.1); border-radius: 999px; padding: 1px 4px;
+}
+.tag-sel-chip .rm:hover { opacity: 1; background: rgba(255,71,87,.3); }
+
+/* ── Hours bar ───────────────────────────────────────────────────────────── */
+.hours-bar-wrap { height: 8px; border-radius: 999px; background: rgba(255,255,255,.07); overflow: hidden; position: relative; }
+.hours-bar-fill { height: 100%; border-radius: 999px; transition: width .5s; }
+
+/* ── Toast ───────────────────────────────────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 24px; right: 24px; z-index: 999;
+  background: #0d1929; border: 1px solid rgba(255,255,255,.15);
+  padding: 12px 18px; border-radius: 12px; font-size: 13px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.5);
+}
+.toast.hidden { display: none; }
+
+/* ── Modal ───────────────────────────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,.7);
+  display: flex; align-items: center; justify-content: center; z-index: 500;
+}
+.modal-overlay.hidden { display: none; }
+.modal-box {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 16px; padding: 24px; width: 520px; max-width: 90vw;
+  max-height: 85vh; overflow-y: auto;
+  box-shadow: 0 24px 60px rgba(0,0,0,.7);
+}
+.modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.modal-title { font-size: 16px; font-weight: 900; }
+.modal-close { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; display: grid; place-items: center; }
+.modal-close svg { width: 16px; height: 16px; }
+.modal-foot { display: flex; gap: 10px; justify-content: flex-end; margin-top: 18px; }
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,.2); }
+
+/* ── Notification items ──────────────────────────────────────────────────── */
+.notif-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 12px 14px; border-radius: 10px; margin-bottom: 8px;
+  border: 1px solid var(--border); background: rgba(255,255,255,.02);
+}
+.notif-item.unread { background: rgba(61,127,255,.07); border-color: rgba(61,127,255,.25); }
+.notif-dot { width: 8px; height: 8px; border-radius: 999px; background: var(--primary); flex-shrink: 0; margin-top: 3px; }
+
+/* ── Role switcher on login ──────────────────────────────────────────────── */
+.role-tabs { display: flex; gap: 0; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 20px; }
+.role-tab { flex: 1; padding: 10px; text-align: center; cursor: pointer; font-weight: 700; font-size: 13px; color: var(--muted); transition: all .15s; }
+.role-tab.active { background: rgba(61,127,255,.15); color: var(--text); }
+</style>
 </head>
 <body>
 
-<header class="topbar">
-<div>EHPAD PRO</div>
-<nav>
-<button onclick="show('dashboard')">Dashboard</button>
-<button onclick="show('planning')">Planning</button>
-<button onclick="show('conges')">Congés</button>
-<button onclick="show('profil')">Profil & Santé</button>
-<button onclick="show('fiche')">Fiche médicale</button>
-</nav>
-</header>
+<div id="root"></div>
+<div class="toast hidden" id="toast"></div>
+<div class="modal-overlay hidden" id="modalOverlay">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-head">
+      <div class="modal-title" id="modalTitle"></div>
+      <button class="modal-close" id="modalClose">
+        <svg viewBox="0 0 24 24"><path d="M18 6L6 18M6 6l12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div id="modalBody"></div>
+    <div class="modal-foot" id="modalFoot"></div>
+  </div>
+</div>
 
-<main>
+<script>
+// ── Shared with mobile via same LS key ─────────────────────────────────────
+const LS_KEY = "ehpad_demo_state_v6";
+const AVATAR_COLORS = ["#3d7fff","#28c76f","#ff8c42","#ff4757","#9b59f7","#00b5d8","#e91e8c","#f39c12"];
 
-<section id="dashboard" class="tab active">
-<h1>Dashboard</h1>
-<div class="card">Logiciel médical version PRO</div>
-</section>
+const SVG = {
+  home:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg>`,
+  calendar: `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 2v3M17 2v3M3 8h18M5 5h14a2 2 0 012 2v13a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2z"/></svg>`,
+  swap:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h14l-3-3M17 17H3l3 3"/></svg>`,
+  msg:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M21 15a4 4 0 01-4 4H8l-5 3V7a4 4 0 014-4h10a4 4 0 014 4z"/></svg>`,
+  heart:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 00-7.8 0L12 5.6l-1-1a5.5 5.5 0 00-7.8 7.8l1 1L12 22l7.8-8.6 1-1a5.5 5.5 0 000-7.8z"/></svg>`,
+  check:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M20 12a8 8 0 11-16 0 8 8 0 0116 0z"/></svg>`,
+  user:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21a8 8 0 10-16 0"/><path d="M12 13a4 4 0 100-8 4 4 0 000 8z"/></svg>`,
+  clock:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>`,
+  plus:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>`,
+  chevL:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>`,
+  chevR:    `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>`,
+  send:     `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13M22 2L15 22l-4-9-9-4 20-7z"/></svg>`,
+  pdf:      `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>`,
+};
 
-<section id="planning" class="tab">
-<h1>Planning</h1>
+// ── Helpers ────────────────────────────────────────────────────────────────
+function iso(d){ return d.toISOString().slice(0,10); }
+function daysFromNow(n){ const d=new Date(); d.setDate(d.getDate()+n); return iso(d); }
+function nowTime(){ return new Date().toLocaleTimeString("fr-FR",{hour:"2-digit",minute:"2-digit"}); }
+function fmtDate(s){ const d=new Date(s+"T00:00:00"); return d.toLocaleDateString("fr-FR",{weekday:"short",day:"2-digit",month:"short"}); }
+function fmtFull(s){ const d=new Date(s+"T00:00:00"); return d.toLocaleDateString("fr-FR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"}); }
+function avatarColor(id){ const i=["u1","u2","u3","u4","u5","u6","u7","u8","u9","u10","u11","u12","u13","u14","d1"].indexOf(id); return AVATAR_COLORS[Math.max(0,i)%AVATAR_COLORS.length]; }
+function avatarInitials(n){ return n.split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
+function userName(id){ return state.users.find(u=>u.id===id)?.name||id; }
+function convo(a,b){ return [a,b].sort().join("_"); }
+function escH(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function shiftCls(label){ return label==="Nuit"?"night":label==="Soir"?"soir":label==="Journée"?"journee":"matin"; }
+function pendingCount(){ return state.swapRequests.filter(r=>r.status==="pending").length+state.leaveRequests.filter(r=>r.status==="pending").length+state.overtime.filter(r=>r.status==="pending").length; }
+function hoursThisMonth(uid){ const ym=`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,"0")}`; return state.shifts.filter(s=>s.userId===uid&&s.date.startsWith(ym)).reduce((a,s)=>{ let m=(+s.end.replace(":",""))-(+s.start.replace(":",""))/100*60; const [sh,sm]=s.start.split(":").map(Number); let [eh,em]=s.end.split(":").map(Number); let mins=(eh*60+em)-(sh*60+sm); if(mins<0)mins+=1440; return a+mins; },0); }
+function otThisMonth(uid){ const ym=`${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,"0")}`; return state.overtime.filter(o=>o.userId===uid&&o.status!=="refused"&&o.date.startsWith(ym)).reduce((a,o)=>a+o.minutes,0); }
+function fmtH(m){ return m>=60?`${Math.floor(m/60)}h${m%60?String(m%60).padStart(2,"0"):""}`:m+" min"; }
+function countDays(f,t){ return Math.round((new Date(t+"T00:00:00")-new Date(f+"T00:00:00"))/86400000)+1; }
+function agentNotifCount(){ return (state.notifications||[]).filter(n=>n.userId===state.session.userId&&!n.read).length; }
+function pushNotif(uid,msg){ state.notifications=state.notifications||[]; state.notifications.push({id:"n_"+Math.random().toString(16).slice(2),userId:uid,msg,time:nowTime(),read:false}); }
 
-<input id="agent" placeholder="Nom agent">
-<input id="date" type="date">
-<select id="shift">
-<option>Matin</option>
-<option>Après-midi</option>
-<option>Nuit</option>
-</select>
-<button onclick="addPlanning()">Ajouter</button>
+// ── State ──────────────────────────────────────────────────────────────────
+function loadState(){
+  const raw=localStorage.getItem(LS_KEY);
+  if(raw){ try{ return JSON.parse(raw); }catch{} }
+  // Seed
+  const users=[
+    {id:"u1",name:"Marie Leroy",unit:"Unité 1",role:"agent"},{id:"u2",name:"Sophie Blanc",unit:"Unité 1",role:"agent"},
+    {id:"u3",name:"Thomas Girard",unit:"Unité 1",role:"agent"},{id:"u4",name:"Lucas Morel",unit:"Unité 1",role:"agent"},
+    {id:"u5",name:"Camille Petit",unit:"Unité 2",role:"agent"},{id:"u6",name:"Julie Renard",unit:"Unité 2",role:"agent"},
+    {id:"u7",name:"Antoine Dubois",unit:"Unité 2",role:"agent"},{id:"u8",name:"Pierre Simon",unit:"Unité 2",role:"agent"},
+    {id:"u9",name:"Isabelle Martin",unit:"Unité 3",role:"agent"},{id:"u10",name:"Céline Bernard",unit:"Unité 3",role:"agent"},
+    {id:"u11",name:"Maxime Robert",unit:"Unité 3",role:"agent"},{id:"u12",name:"Hugo Fontaine",unit:"Unité 3",role:"agent"},
+    {id:"u13",name:"Nadia Khelil",unit:"Nuit",role:"agent"},{id:"u14",name:"Kevin Rousseau",unit:"Nuit",role:"agent"},
+    {id:"d1",name:"Mme Robert",unit:"Direction",role:"direction"}
+  ];
+  const today=new Date();
+  const shifts=[];
+  let sid=1;
+  for(let i=-5;i<=30;i++){
+    const d=new Date(today); d.setDate(today.getDate()+i);
+    const di=iso(d); const wd=d.getDay(); const we=wd>=6;
+    const wk=Math.abs(i)%2===0;
+    if(!we){
+      const [ma,mb,sa,sb]=wk?["u1","u2","u3","u4"]:["u2","u1","u4","u3"];
+      shifts.push({id:`s${sid++}`,userId:ma,unit:"Unité 1",date:di,start:"07:00",end:"14:15",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:mb,unit:"Unité 1",date:di,start:"07:00",end:"14:30",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:sa,unit:"Unité 1",date:di,start:"14:00",end:"21:00",label:"Soir"});
+      shifts.push({id:`s${sid++}`,userId:sb,unit:"Unité 1",date:di,start:"14:00",end:"21:30",label:"Soir"});
+      const [ma2,mb2,sa2,sb2]=wk?["u5","u6","u7","u8"]:["u6","u5","u8","u7"];
+      shifts.push({id:`s${sid++}`,userId:ma2,unit:"Unité 2",date:di,start:"07:00",end:"14:15",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:mb2,unit:"Unité 2",date:di,start:"07:00",end:"14:30",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:sa2,unit:"Unité 2",date:di,start:"14:00",end:"21:00",label:"Soir"});
+      shifts.push({id:`s${sid++}`,userId:sb2,unit:"Unité 2",date:di,start:"14:00",end:"21:30",label:"Soir"});
+      const [ma3,mb3,sa3,sb3]=wk?["u9","u10","u11","u12"]:["u10","u9","u12","u11"];
+      shifts.push({id:`s${sid++}`,userId:ma3,unit:"Unité 3",date:di,start:"07:00",end:"14:15",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:mb3,unit:"Unité 3",date:di,start:"07:00",end:"14:30",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:sa3,unit:"Unité 3",date:di,start:"14:00",end:"21:00",label:"Soir"});
+      shifts.push({id:`s${sid++}`,userId:sb3,unit:"Unité 3",date:di,start:"14:00",end:"21:30",label:"Soir"});
+    } else {
+      const [w1,w2,w3]=wd===6?["u1","u3","u2"]:["u2","u4","u1"];
+      shifts.push({id:`s${sid++}`,userId:w1,unit:"Unité 1",date:di,start:"07:00",end:"14:30",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:w2,unit:"Unité 1",date:di,start:"08:00",end:"20:00",label:"Journée"});
+      shifts.push({id:`s${sid++}`,userId:w3,unit:"Unité 1",date:di,start:"14:00",end:"21:30",label:"Soir"});
+      const [w4,w5,w6]=wd===6?["u5","u7","u6"]:["u6","u8","u5"];
+      shifts.push({id:`s${sid++}`,userId:w4,unit:"Unité 2",date:di,start:"07:00",end:"14:30",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:w5,unit:"Unité 2",date:di,start:"08:00",end:"20:00",label:"Journée"});
+      shifts.push({id:`s${sid++}`,userId:w6,unit:"Unité 2",date:di,start:"14:00",end:"21:30",label:"Soir"});
+      const [w7,w8,w9]=wd===6?["u9","u11","u10"]:["u10","u12","u9"];
+      shifts.push({id:`s${sid++}`,userId:w7,unit:"Unité 3",date:di,start:"07:00",end:"14:30",label:"Matin"});
+      shifts.push({id:`s${sid++}`,userId:w8,unit:"Unité 3",date:di,start:"08:00",end:"20:00",label:"Journée"});
+      shifts.push({id:`s${sid++}`,userId:w9,unit:"Unité 3",date:di,start:"14:00",end:"21:30",label:"Soir"});
+    }
+    const na=d.toDateString().charCodeAt(0)%2===0?"u13":"u14";
+    const nb=na==="u13"?"u14":"u13";
+    shifts.push({id:`s${sid++}`,userId:na,unit:"Nuit",date:di,start:"21:00",end:"07:30",label:"Nuit"});
+    shifts.push({id:`s${sid++}`,userId:nb,unit:"Nuit",date:di,start:"21:00",end:"07:30",label:"Nuit"});
+  }
+  return {
+    session:{role:"direction",userId:"d1"},
+    users, shifts,
+    swapRequests:[
+      {id:"sw1",requesterId:"u1",targetId:"u2",requesterName:"Marie Leroy",targetName:"Sophie Blanc",requesterShiftId:"",targetShiftId:"",status:"pending",createdAt:"23/03/2026 09:15"},
+      {id:"sw2",requesterId:"u3",targetId:"u4",requesterName:"Thomas Girard",targetName:"Lucas Morel",requesterShiftId:"",targetShiftId:"",status:"approved",createdAt:"18/03/2026 14:30"},
+    ],
+    leaveRequests:[
+      {id:"lv1",userId:"u1",type:"Congés payés",from:daysFromNow(15),to:daysFromNow(19),note:"Congés de printemps",status:"pending",createdAt:"20/03/2026 10:00"},
+      {id:"lv2",userId:"u5",type:"Arrêt maladie",from:daysFromNow(-7),to:daysFromNow(-5),note:"Grippe — certificat fourni",status:"approved",createdAt:"17/03/2026 07:30"},
+      {id:"lv3",userId:"u9",type:"Congé sans solde",from:daysFromNow(10),to:daysFromNow(10),note:"Démarches administratives",status:"pending",createdAt:"22/03/2026 16:00"},
+    ],
+    overtime:[
+      {id:"ot1",userId:"u2",minutes:30,date:daysFromNow(-4),note:"Transmission longue",status:"pending",createdAt:"21/03/2026 14:45"},
+      {id:"ot2",userId:"u7",minutes:15,date:daysFromNow(-3),note:"Remplacement collègue",status:"approved",createdAt:"20/03/2026 21:45"},
+      {id:"ot3",userId:"u13",minutes:45,date:daysFromNow(-6),note:"Surveillance prolongée",status:"approved",createdAt:"20/03/2026 07:45"},
+    ],
+    profiles:{
+      u1:{birthDate:"1985-04-12",heightCm:"165",weightKg:"58",allergies:"Pénicilline",treatments:"Ventoline (inhalateur)",bloodType:"A+",notes:"Asthme léger.",emergencyName:"Jean Leroy",emergencyPhone:"06 12 34 56 78",updatedAt:"10/03/2026"},
+      u2:{birthDate:"1990-06-18",heightCm:"163",weightKg:"61",allergies:"",treatments:"Lévothyroxine 75µg",bloodType:"O+",notes:"Hypothyroïdie.",emergencyName:"Claire Blanc",emergencyPhone:"06 23 45 67 89",updatedAt:"05/03/2026"},
+      u3:{birthDate:"1988-11-03",heightCm:"178",weightKg:"76",allergies:"Aspirine",treatments:"",bloodType:"B+",notes:"",emergencyName:"Lucie Girard",emergencyPhone:"06 34 56 78 90",updatedAt:"12/02/2026"},
+      u5:{birthDate:"1987-09-14",heightCm:"166",weightKg:"60",allergies:"Latex",treatments:"Oméprazole 20mg",bloodType:"O-",notes:"Gants non latex obligatoires.",emergencyName:"Éric Petit",emergencyPhone:"06 56 78 90 12",updatedAt:"08/03/2026"},
+      u7:{birthDate:"1986-12-22",heightCm:"175",weightKg:"72",allergies:"Sulfamides",treatments:"Bisoprolol 5mg, Ramipril 5mg",bloodType:"A+",notes:"HTA suivie.",emergencyName:"Sara Dubois",emergencyPhone:"06 78 90 12 34",updatedAt:"15/03/2026"},
+      u13:{birthDate:"1984-10-02",heightCm:"164",weightKg:"59",allergies:"Pénicilline",treatments:"Mélatonine 2mg",bloodType:"A+",notes:"Travail de nuit.",emergencyName:"Karim Khelil",emergencyPhone:"06 34 56 78 90",updatedAt:"07/03/2026"},
+    },
+    messages:{
+      d1_u1:[{from:"d1",text:"Bonjour Marie, votre demande de congés a bien été reçue.",time:"10:15"},{from:"u1",text:"Merci Mme Robert !",time:"10:32"}],
+      d1_u2:[{from:"u2",text:"L'arrêt maladie a bien été enregistré ?",time:"14:00"},{from:"d1",text:"Oui Thomas, tout est en ordre. Bon rétablissement !",time:"14:12"}],
+    },
+    notifications:[],
+    ui:{}
+  };
+}
+function saveState(){ localStorage.setItem(LS_KEY,JSON.stringify(state)); }
 
-<ul id="planningList"></ul>
-</section>
+let state = loadState();
+let currentPage = "dashboard";
+let activeChatPeer = "u1";
 
-<section id="conges" class="tab">
-<h1>Demandes</h1>
+// ── Nav items per role ─────────────────────────────────────────────────────
+const navAgent = [
+  {id:"dashboard",label:"Accueil",icon:"home"},
+  {id:"planning",label:"Planning",icon:"calendar"},
+  {id:"echanges",label:"Échanges",icon:"swap"},
+  {id:"messages",label:"Messages",icon:"msg"},
+  {id:"profil",label:"Mon profil",icon:"heart"},
+];
+const navDir = [
+  {id:"dashboard",label:"Accueil",icon:"home"},
+  {id:"planning",label:"Planning",icon:"calendar"},
+  {id:"validations",label:"Validations",icon:"check"},
+  {id:"messages",label:"Messages",icon:"msg"},
+  {id:"profils",label:"Profils agents",icon:"heart"},
+];
 
-<input id="nomDemande" placeholder="Nom">
-<select id="typeDemande">
-<option>Congé</option>
-<option>Arrêt maladie</option>
-</select>
-<input type="date" id="dateDebut">
-<input type="date" id="dateFin">
-<button onclick="addDemande()">Envoyer</button>
+// ── Render ─────────────────────────────────────────────────────────────────
+function render(){
+  const root = document.getElementById("root");
+  if(!state.session?.userId){
+    root.innerHTML = renderLogin();
+    bindLogin();
+    return;
+  }
+  root.innerHTML = renderShell();
+  bindNav();
+  renderPage();
+}
 
-<ul id="demandeList"></ul>
-</section>
+function renderLogin(){
+  const role = state.session?.role||"direction";
+  const users = state.users.filter(u=>u.role===role);
+  return `
+  <div class="login-screen">
+    <div class="login-card">
+      <div class="login-logo">E</div>
+      <div class="login-title">EHPAD Staff</div>
+      <div class="login-sub">Interface de gestion — version bureau</div>
+      <div class="role-tabs">
+        <div class="role-tab ${role==="agent"?"active":""}" data-role="agent">👤 Agent</div>
+        <div class="role-tab ${role==="direction"?"active":""}" data-role="direction">🏢 Direction</div>
+      </div>
+      <div class="avatar-grid" id="avatarGrid">
+        ${users.map(u=>`
+          <div class="avatar-chip ${u.id===state.session.userId?'active':''}" data-uid="${u.id}">
+            <div class="avatar-circle" style="background:${avatarColor(u.id)}">${avatarInitials(u.name)}</div>
+            <div>${u.name.split(" ")[0]}</div>
+            <div style="font-size:10px;color:var(--muted)">${u.unit}</div>
+          </div>`).join("")}
+      </div>
+      <button class="btn primary full" id="btnLogin">Se connecter</button>
+    </div>
+  </div>`;
+}
 
-<section id="profil" class="tab">
-<h1>Profil & Santé</h1>
+function bindLogin(){
+  let selUserId = state.session.userId || state.users.find(u=>u.role===(state.session.role||"direction"))?.id;
 
-<input id="search" placeholder="Ajouter maladie / allergie / traitement">
-<button onclick="addHealth()">Ajouter</button>
+  document.querySelectorAll(".role-tab").forEach(t=>t.addEventListener("click",()=>{
+    const role=t.getAttribute("data-role");
+    state.session.role=role;
+    state.session.userId=state.users.find(u=>u.role===role)?.id||"";
+    render();
+  }));
 
-<div id="healthList"></div>
+  function bindChips(){
+    document.querySelectorAll(".avatar-chip").forEach(c=>c.addEventListener("click",()=>{
+      selUserId=c.getAttribute("data-uid");
+      document.querySelectorAll(".avatar-chip").forEach(x=>x.classList.toggle("active",x===c));
+    }));
+  }
+  bindChips();
 
-<button onclick="saveHealth()">Enregistrer</button>
-</section>
+  document.getElementById("btnLogin")?.addEventListener("click",()=>{
+    state.session.userId=selUserId;
+    saveState();
+    currentPage="dashboard";
+    render(); toast("Connecté ✅");
+  });
+}
 
-<section id="fiche" class="tab">
-<h1>Fiche médicale</h1>
-<div id="ficheData"></div>
-</section>
+function renderShell(){
+  const u=me(); const isDir=isDirection();
+  const nav=isDir?navDir:navAgent;
+  const count=pendingCount();
+  const notifs=agentNotifCount();
+  return `
+  <div class="layout">
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <div class="sidebar-logo">E</div>
+        <div>
+          <div class="sidebar-title">EHPAD Staff</div>
+          <div class="sidebar-sub">${isDir?"Direction":"Agent"}</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section">${isDir?"Tableau de bord":"Mon espace"}</div>
+        ${nav.map(n=>`
+          <div class="nav-item ${currentPage===n.id?"active":""}" data-nav="${n.id}">
+            ${SVG[n.icon]}
+            ${n.label}
+            ${n.id==="validations"&&count>0?`<span class="nav-badge">${count}</span>`:""}
+            ${n.id==="profil"&&notifs>0?`<span class="nav-badge">${notifs}</span>`:""}
+          </div>`).join("")}
+      </nav>
+      <div class="sidebar-user">
+        <div class="avatar-circle user-avatar" style="background:${avatarColor(u.id)}">${avatarInitials(u.name)}</div>
+        <div>
+          <div class="user-name">${u.name}</div>
+          <div class="user-role">${u.unit}</div>
+        </div>
+        <button class="btn-logout" id="btnLogout">Quitter</button>
+      </div>
+    </aside>
+    <div class="main-area">
+      <div class="topbar">
+        <div class="topbar-left">
+          <div class="topbar-title" id="pageTitle">${pageTitles[currentPage]||"EHPAD"}</div>
+        </div>
+        <div class="topbar-right" id="topbarRight"></div>
+      </div>
+      <div class="content" id="pageContent"></div>
+    </div>
+  </div>`;
+}
 
-</main>
+const pageTitles = {
+  dashboard:"Tableau de bord",planning:"Planning",echanges:"Échanges d'horaires",
+  messages:"Messagerie",profil:"Mon profil & santé",validations:"Validations",profils:"Profils agents"
+};
 
-<script src="app.js"></script>
+function bindNav(){
+  document.querySelectorAll(".nav-item").forEach(el=>el.addEventListener("click",()=>{
+    currentPage=el.getAttribute("data-nav");
+    document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x===el));
+    document.getElementById("pageTitle").textContent=pageTitles[currentPage]||"EHPAD";
+    renderPage();
+  }));
+  document.getElementById("btnLogout")?.addEventListener("click",()=>{
+    state.session={role:"direction",userId:""};
+    saveState(); render();
+  });
+}
+
+function renderPage(){
+  const c=document.getElementById("pageContent"); if(!c) return;
+  const isDir=isDirection();
+  if(currentPage==="dashboard") c.innerHTML=isDir?viewDashboardDir():viewDashboardAgent();
+  else if(currentPage==="planning") c.innerHTML=viewPlanning();
+  else if(currentPage==="echanges") c.innerHTML=viewEchanges();
+  else if(currentPage==="messages") viewMessages();
+  else if(currentPage==="profil") c.innerHTML=viewProfil();
+  else if(currentPage==="validations") c.innerHTML=viewValidations();
+  else if(currentPage==="profils") c.innerHTML=viewProfils();
+  bindPageHandlers();
+}
+
+function me(){ return state.users.find(u=>u.id===state.session.userId); }
+function isDirection(){ return state.session.role==="direction"; }
+
+// ── Dashboard Direction ───────────────────────────────────────────────────
+function viewDashboardDir(){
+  const today=iso(new Date());
+  const todayShifts=state.shifts.filter(s=>s.date===today);
+  const agentsToday=[...new Set(todayShifts.map(s=>s.userId))].length;
+  const pending=pendingCount();
+  const now=new Date(); const ym=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,"0")}`;
+  const otMins=state.overtime.filter(o=>o.status==="approved"&&o.date.startsWith(ym)).reduce((a,o)=>a+o.minutes,0);
+  const units=[...new Set(state.shifts.map(s=>s.unit))].sort();
+  const pendingItems=[
+    ...state.swapRequests.filter(r=>r.status==="pending").slice(0,2),
+    ...state.leaveRequests.filter(r=>r.status==="pending").slice(0,2),
+    ...state.overtime.filter(r=>r.status==="pending").slice(0,2),
+  ].slice(0,4);
+
+  return `
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(61,127,255,.15);color:var(--primary)">${SVG.user}</div><div><div class="kpi-val">${agentsToday}</div><div class="kpi-label">Agents présents aujourd'hui</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(${pending>0?"255,71,87":"40,199,111"},.15);color:${pending>0?"var(--danger)":"var(--success)"}">${SVG.check}</div><div><div class="kpi-val">${pending}</div><div class="kpi-label">Demandes en attente</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(155,89,247,.15);color:var(--purple)">${SVG.clock}</div><div><div class="kpi-val">${fmtH(otMins)||"0"}</div><div class="kpi-label">Heures supp validées (mois)</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(255,140,66,.15);color:var(--orange)">${SVG.calendar}</div><div><div class="kpi-val">${state.users.filter(u=>u.role==="agent").length}</div><div class="kpi-label">Agents au total</div></div></div>
+  </div>
+
+  <div class="grid-2-1">
+    <div class="col-stack">
+      <!-- Planning du jour -->
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div><div class="card-title">Planning du jour</div><div class="card-sub">${fmtDate(today)}</div></div>
+          <div style="display:flex;gap:8px">
+            <button class="btn sm" id="btnExportPDF">${SVG.pdf} Exporter PDF</button>
+            <button class="btn sm primary" id="btnAddShift">${SVG.plus} Ajouter</button>
+          </div>
+        </div>
+        ${units.map(unit=>{
+          const sh=todayShifts.filter(s=>s.unit===unit);
+          return `<div style="margin-bottom:14px">
+            <div class="section-title">${unit}</div>
+            ${sh.length?`<div style="display:flex;flex-wrap:wrap;gap:8px">${sh.map(s=>`
+              <div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;border:1px solid var(--border);background:rgba(255,255,255,.02)">
+                <div class="avatar-circle" style="width:30px;height:30px;border-radius:8px;font-size:11px;background:${avatarColor(s.userId)}">${avatarInitials(userName(s.userId))}</div>
+                <div><div style="font-weight:750;font-size:13px">${userName(s.userId)}</div><div style="font-size:11px;color:var(--muted)">${s.start}–${s.end}</div></div>
+                <span class="tag ${shiftCls(s.label)}">${s.label}</span>
+              </div>`).join("")}</div>`:
+            `<div class="muted">Aucun horaire ce jour.</div>`}
+          </div>`;
+        }).join("")}
+      </div>
+
+      <!-- Heures supp par agent -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Heures supp — ${now.toLocaleDateString("fr-FR",{month:"long",year:"numeric"})}</div>
+        ${state.users.filter(u=>u.role==="agent").map(u=>{
+          const m=state.overtime.filter(o=>o.userId===u.id&&o.status==="approved"&&o.date.startsWith(ym)).reduce((a,o)=>a+o.minutes,0);
+          if(!m) return "";
+          const pct=Math.min(100,Math.round(m/(35*60)*100));
+          return `<div style="margin-bottom:12px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <div style="display:flex;align-items:center;gap:8px">
+                <div class="avatar-circle" style="width:26px;height:26px;border-radius:7px;font-size:10px;background:${avatarColor(u.id)}">${avatarInitials(u.name)}</div>
+                <span style="font-size:13px;font-weight:750">${u.name}</span>
+                <span class="muted">${u.unit}</span>
+              </div>
+              <span style="font-size:12px;font-weight:800">${fmtH(m)}</span>
+            </div>
+            <div class="hours-bar-wrap"><div class="hours-bar-fill" style="width:${pct}%;background:linear-gradient(90deg,var(--primary),var(--purple))"></div></div>
+          </div>`;
+        }).join("")||`<div class="muted">Aucune heure supp validée ce mois.</div>`}
+      </div>
+    </div>
+
+    <!-- Pending validations -->
+    <div class="col-stack">
+      <div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <div class="card-title">Demandes en attente</div>
+          <button class="btn sm" id="btnGoValidations">Tout voir →</button>
+        </div>
+        ${pendingItems.length?pendingItems.map(r=>{
+          if(r.requesterShiftId!==undefined) return `<div class="val-card">
+            <div class="val-card-title">Échange • ${r.requesterName||userName(r.requesterId)} ↔ ${r.targetName||userName(r.targetId)}</div>
+            <div class="val-card-sub">${r.createdAt}</div>
+            <div class="val-actions">
+              <button class="btn sm primary" data-swap-approve="${r.id}">✓ Accepter</button>
+              <button class="btn sm danger" data-swap-refuse="${r.id}">✗ Refuser</button>
+            </div></div>`;
+          if(r.type) return `<div class="val-card">
+            <div class="val-card-title">${userName(r.userId)} • ${r.type}</div>
+            <div class="val-card-sub">${fmtDate(r.from)} → ${fmtDate(r.to)} • ${countDays(r.from,r.to)} jour(s)${r.note?" • "+r.note:""}</div>
+            <div class="val-actions">
+              <button class="btn sm primary" data-leave-approve="${r.id}">✓ Accepter</button>
+              <button class="btn sm danger" data-leave-refuse="${r.id}">✗ Refuser</button>
+            </div></div>`;
+          return `<div class="val-card">
+            <div class="val-card-title">${userName(r.userId)} • ${r.minutes} min supp</div>
+            <div class="val-card-sub">${fmtDate(r.date)}${r.note?" • "+r.note:""}</div>
+            <div class="val-actions">
+              <button class="btn sm primary" data-ot-approve="${r.id}">✓ Valider</button>
+              <button class="btn sm danger" data-ot-refuse="${r.id}">✗ Refuser</button>
+            </div></div>`;
+        }).join(""):
+        `<div style="text-align:center;padding:30px;color:var(--muted)">🎉<br>Aucune demande en attente !</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Dashboard Agent ────────────────────────────────────────────────────────
+function viewDashboardAgent(){
+  const u=me();
+  const today=iso(new Date());
+  const todayShifts=state.shifts.filter(s=>s.userId===u.id&&s.date===today);
+  const mins=hoursThisMonth(u.id);
+  const otMins=otThisMonth(u.id);
+  const total=mins+otMins;
+  const pct=Math.min(100,Math.round(total/(35*60)*100));
+  const notifs=(state.notifications||[]).filter(n=>n.userId===u.id).slice().reverse();
+  const myRequests=[
+    ...state.leaveRequests.filter(r=>r.userId===u.id).slice().reverse().slice(0,3),
+    ...state.overtime.filter(r=>r.userId===u.id).slice().reverse().slice(0,3),
+  ];
+
+  return `
+  <div class="kpi-row">
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(61,127,255,.15);color:var(--primary)">${SVG.calendar}</div><div><div class="kpi-val">${todayShifts.length?todayShifts[0].start+"–"+todayShifts[0].end:"Repos"}</div><div class="kpi-label">Poste aujourd'hui</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(40,199,111,.15);color:var(--success)">${SVG.clock}</div><div><div class="kpi-val">${fmtH(mins)}</div><div class="kpi-label">Heures planifiées (mois)</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(155,89,247,.15);color:var(--purple)">${SVG.clock}</div><div><div class="kpi-val">${otMins?"+"+fmtH(otMins):"0"}</div><div class="kpi-label">Heures supp déclarées</div></div></div>
+    <div class="kpi-card"><div class="kpi-icon" style="background:rgba(255,71,87,.15);color:var(--danger)">${SVG.check}</div><div><div class="kpi-val">${state.swapRequests.filter(r=>(r.requesterId===u.id||r.targetId===u.id)&&r.status==="pending").length}</div><div class="kpi-label">Échanges en attente</div></div></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="col-stack">
+      <!-- Compteur heures -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Compteur d'heures — ${new Date().toLocaleDateString("fr-FR",{month:"long"})}</div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <div style="display:flex;gap:12px">
+            <span style="font-size:12px;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:99px;background:var(--primary);display:inline-block"></span>Planifié : ${fmtH(mins)}</span>
+            ${otMins?`<span style="font-size:12px;display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:99px;background:var(--purple);display:inline-block"></span>Supp : +${fmtH(otMins)}</span>`:""}
+          </div>
+          <span style="font-size:12px;font-weight:800">${fmtH(total)} / 35h</span>
+        </div>
+        <div class="hours-bar-wrap" style="height:10px">
+          <div style="position:absolute;left:0;top:0;height:100%;width:${Math.min(100,Math.round(mins/(35*60)*100))}%;background:var(--primary);border-radius:999px"></div>
+          ${otMins?`<div style="position:absolute;left:${Math.min(100,Math.round(mins/(35*60)*100))}%;top:0;height:100%;width:${Math.min(100-Math.min(100,Math.round(mins/(35*60)*100)),Math.round(otMins/(35*60)*100))}%;background:var(--purple);border-radius:999px"></div>`:""}
+        </div>
+      </div>
+
+      <!-- Mes prochains postes -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Mes 5 prochains postes</div>
+        ${state.shifts.filter(s=>s.userId===u.id&&s.date>=today).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,5).map(s=>`
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)">
+            <div>
+              <div style="font-weight:750;font-size:13px">${fmtDate(s.date)}</div>
+              <div style="font-size:12px;color:var(--muted)">${s.start}–${s.end}</div>
+            </div>
+            <span class="tag ${shiftCls(s.label)}">${s.label}</span>
+          </div>`).join("")||`<div class="muted">Aucun poste à venir.</div>`}
+      </div>
+    </div>
+
+    <div class="col-stack">
+      <!-- Notifications -->
+      ${notifs.length?`<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title">Notifications</div>
+          <button class="btn sm" id="btnClearNotifs">Tout lire</button>
+        </div>
+        ${notifs.slice(0,5).map(n=>`
+          <div class="notif-item ${n.read?"":"unread"}">
+            ${!n.read?`<div class="notif-dot"></div>`:""}
+            <div><div style="font-size:13px">${n.msg}</div><div class="muted">${n.time}</div></div>
+          </div>`).join("")}
+      </div>`:""}
+
+      <!-- Mes demandes -->
+      <div class="card">
+        <div class="card-title" style="margin-bottom:12px">Mes demandes récentes</div>
+        ${myRequests.length?myRequests.map(r=>{
+          const badge=r.status==="approved"?`<span class="badge ok">Approuvé</span>`:r.status==="refused"?`<span class="badge no">Refusé</span>`:`<span class="badge warn">En attente</span>`;
+          if(r.type) return `<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between"><span style="font-weight:750">${r.type}</span>${badge}</div><div class="muted">${fmtDate(r.from)} → ${fmtDate(r.to)}</div></div>`;
+          return `<div style="padding:10px 0;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between"><span style="font-weight:750">${r.minutes} min supp</span>${badge}</div><div class="muted">${fmtDate(r.date)}</div></div>`;
+        }).join(""):
+        `<div class="muted">Aucune demande récente.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Planning ───────────────────────────────────────────────────────────────
+function viewPlanning(){
+  const u=me(); const isDir=isDirection();
+  state.ui=state.ui||{};
+  const today=new Date();
+  const calView=state.ui.calendarView||"month";
+  const ym=state.ui.calendarYM||{y:today.getFullYear(),m:today.getMonth()};
+  const calUnit=state.ui.calendarUnit||(isDir?"Unité 1":u.unit);
+  const meId=isDir?null:u.id;
+  const units=[...new Set(state.shifts.map(s=>s.unit))].sort();
+  const selIso=state.ui.calendarSelectedIso||iso(today);
+
+  let calContent="";
+  if(calView==="month"){
+    const first=new Date(ym.y,ym.m,1);
+    const daysInMonth=new Date(ym.y,ym.m+1,0).getDate();
+    const dow=(first.getDay()+6)%7;
+    const cells=[]; for(let i=0;i<42;i++){const dn=i-dow+1;cells.push({date:new Date(ym.y,ym.m,dn),off:dn<1||dn>daysInMonth});}
+    calContent=`
+      <div class="cal-dow"><div>Lun</div><div>Mar</div><div>Mer</div><div>Jeu</div><div>Ven</div><div style="color:rgba(255,184,48,.8)">Sam</div><div style="color:rgba(255,100,100,.8)">Dim</div></div>
+      <div class="cal-grid">
+        ${cells.map(c=>{
+          const di=iso(c.date); const dw=c.date.getDay();
+          const isToday=di===iso(today); const isSel=di===selIso;
+          const shifts=state.shifts.filter(s=>s.unit===calUnit&&s.date===di);
+          const myShifts=meId?shifts.filter(s=>s.userId===meId):[];
+          return `<div class="cal-cell ${c.off?"off":""} ${isToday?"today":""} ${isSel?"sel":""} ${(dw===0||dw===6)&&!c.off?"cal-weekend":""}" data-cal-date="${di}">
+            <div class="cal-num">${c.date.getDate()}</div>
+            <div class="cal-shifts">
+              ${shifts.slice(0,3).map(s=>`<div class="cal-shift-pill ${shiftCls(s.label)} ${s.userId===meId?"mine":""}">${s.start}–${s.end} <span style="opacity:.7">${userName(s.userId).split(" ")[0]}</span></div>`).join("")}
+              ${shifts.length>3?`<div style="font-size:10px;color:var(--muted)">+${shifts.length-3} autres</div>`:""}
+            </div>
+          </div>`;
+        }).join("")}
+      </div>
+      <div class="day-panel" id="dayPanel">
+        ${renderDayDetail(selIso,calUnit,meId)}
+      </div>`;
+  } else {
+    // Week view
+    const offset=state.ui.weekOffset||0;
+    const monday=new Date(today); monday.setDate(today.getDate()-((today.getDay()+6)%7)+offset*7);
+    const days=[]; for(let i=0;i<7;i++){const d=new Date(monday);d.setDate(monday.getDate()+i);days.push(d);}
+    const agents=state.users.filter(u2=>u2.unit===calUnit||calUnit==="Nuit"&&u2.unit==="Nuit");
+    calContent=`
+      <div class="week-head">
+        <div style="display:flex;align-items:center;gap:10px">
+          <button class="cal-nav-btn" id="btnWeekPrev">${SVG.chevL}</button>
+          <span style="font-weight:800;font-size:14px">${days[0].toLocaleDateString("fr-FR",{day:"2-digit",month:"short"})} – ${days[6].toLocaleDateString("fr-FR",{day:"2-digit",month:"short",year:"numeric"})}</span>
+          <button class="cal-nav-btn" id="btnWeekNext">${SVG.chevR}</button>
+        </div>
+      </div>
+      <div style="overflow-x:auto">
+        <div class="week-grid" style="min-width:700px">
+          <div class="week-col-head"></div>
+          ${days.map(d=>`<div class="week-col-head ${iso(d)===iso(today)?"today":""}">${d.toLocaleDateString("fr-FR",{weekday:"short"})}<span>${d.getDate()}</span></div>`).join("")}
+          ${agents.map(ag=>`
+            <div class="week-row-label">
+              <div>
+                <div class="avatar-circle" style="width:28px;height:28px;border-radius:8px;font-size:10px;background:${avatarColor(ag.id)};margin:0 auto 3px">${avatarInitials(ag.name)}</div>
+                <div style="font-size:10px;font-weight:700">${ag.name.split(" ")[0]}</div>
+              </div>
+            </div>
+            ${days.map(d=>{
+              const di=iso(d);
+              const sh=state.shifts.filter(s=>s.userId===ag.id&&s.date===di);
+              return `<div class="week-cell">${sh.map(s=>`<div class="week-event ${shiftCls(s.label)} ${meId&&s.userId===meId?"mine":""}">${s.start}–${s.end}</div>`).join("")}</div>`;
+            }).join("")}`).join("")}
+        </div>
+      </div>`;
+  }
+
+  return `
+    <div class="cal-wrap">
+      <div class="cal-head">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="cal-nav-btn" id="btnCalPrev">${SVG.chevL}</button>
+          <span class="cal-title">${calView==="month"?capitalize(new Date(ym.y,ym.m,1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"})):"Vue Semaine"}</span>
+          <button class="cal-nav-btn" id="btnCalNext">${SVG.chevR}</button>
+        </div>
+        <div class="cal-controls">
+          <div class="unit-tabs">
+            ${units.map(u2=>`<div class="unit-tab ${calUnit===u2?"active":""}" data-unit="${u2}">${u2}</div>`).join("")}
+          </div>
+          <button class="btn sm ${calView==="month"?"primary":""}" id="btnViewMonth">Mois</button>
+          <button class="btn sm ${calView==="week"?"primary":""}" id="btnViewWeek">Semaine</button>
+          ${isDir?`<button class="btn sm" id="btnExportPDF2">${SVG.pdf} PDF</button>`:""}
+        </div>
+      </div>
+      ${calContent}
+    </div>`;
+}
+
+function renderDayDetail(dayIso, unit, meId){
+  const d=new Date(dayIso+"T00:00:00");
+  const title=d.toLocaleDateString("fr-FR",{weekday:"long",day:"2-digit",month:"long",year:"numeric"});
+  const shifts=state.shifts.filter(s=>s.unit===unit&&s.date===dayIso);
+  if(!shifts.length) return `<div class="day-panel-title">${capitalize(title)}</div><div class="muted">Aucun horaire dans cette unité ce jour.</div>`;
+  return `
+    <div class="day-panel-title">${capitalize(title)}</div>
+    <div class="day-panel-shifts">
+      ${shifts.map(s=>`
+        <div class="day-shift-card" style="border-left:3px solid ${s.label==="Nuit"?"#9b59f7":s.label==="Soir"?"#ff8c42":s.label==="Journée"?"#ffb830":"#3d7fff"}">
+          <div class="day-shift-time">${s.start}–${s.end}</div>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:6px">
+            <div class="avatar-circle" style="width:26px;height:26px;border-radius:7px;font-size:10px;background:${avatarColor(s.userId)}">${avatarInitials(userName(s.userId))}</div>
+            <div class="day-shift-agent">${userName(s.userId)}${s.userId===meId?" (Moi)":""}</div>
+          </div>
+          <span class="tag ${shiftCls(s.label)}" style="margin-top:6px">${s.label}</span>
+        </div>`).join("")}
+    </div>`;
+}
+
+// ── Échanges agent ─────────────────────────────────────────────────────────
+function viewEchanges(){
+  const u=me();
+  const myShifts=state.shifts.filter(s=>s.userId===u.id).sort((a,b)=>a.date.localeCompare(b.date));
+  const colleagues=state.users.filter(x=>x.role==="agent"&&x.unit===u.unit&&x.id!==u.id);
+  const history=state.swapRequests.filter(r=>r.requesterId===u.id||r.targetId===u.id).slice().reverse();
+
+  return `
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">Proposer un échange</div>
+      <div class="col-stack" style="gap:12px">
+        <div class="field"><label>1) Mon horaire</label>
+          <select id="swapMyShift"><option value="">— Choisir —</option>${myShifts.map(s=>`<option value="${s.id}">${fmtDate(s.date)} • ${s.start}–${s.end} (${s.label})</option>`).join("")}</select>
+        </div>
+        <div class="field"><label>2) Collègue</label>
+          <select id="swapColleague"><option value="">— Choisir —</option>${colleagues.map(c=>`<option value="${c.id}">${c.name}</option>`).join("")}</select>
+        </div>
+        <div class="field"><label>3) Son horaire</label>
+          <select id="swapColShift" disabled><option value="">— Choisir le collègue d'abord —</option></select>
+        </div>
+        <button class="btn primary" id="btnSendSwap">Envoyer à la direction</button>
+        <div id="swapHint"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="margin-bottom:14px">Historique des échanges</div>
+      ${history.length?history.map(r=>{
+        const badge=r.status==="approved"?`<span class="badge ok">Validé</span>`:r.status==="refused"?`<span class="badge no">Refusé</span>`:`<span class="badge warn">En attente</span>`;
+        const my=state.shifts.find(s=>s.id===r.requesterShiftId);
+        const co=state.shifts.find(s=>s.id===r.targetShiftId);
+        return `<div class="val-card">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start">
+            <div><div class="val-card-title">${r.requesterName||userName(r.requesterId)} ↔ ${r.targetName||userName(r.targetId)}</div>
+            <div class="val-card-sub">${r.createdAt}</div></div>${badge}
+          </div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <div style="flex:1;padding:8px;border-radius:8px;background:rgba(61,127,255,.08);font-size:12px"><div style="font-weight:750">${my?fmtDate(my.date)+" • "+my.start+"–"+my.end:"—"}</div></div>
+            <div style="flex:1;padding:8px;border-radius:8px;background:rgba(255,140,66,.08);font-size:12px"><div style="font-weight:750">${co?fmtDate(co.date)+" • "+co.start+"–"+co.end:"—"}</div></div>
+          </div>
+        </div>`;
+      }).join(""):
+      `<div style="text-align:center;padding:30px;color:var(--muted)">Aucune demande d'échange pour l'instant.</div>`}
+    </div>
+  </div>`;
+}
+
+// ── Messages ───────────────────────────────────────────────────────────────
+function viewMessages(){
+  const c=document.getElementById("pageContent");
+  const u=me(); const isDir=isDirection();
+  const peers=isDir
+    ? state.users.filter(x=>x.role==="agent")
+    : [...state.users.filter(x=>x.role==="agent"&&x.unit===u.unit&&x.id!==u.id),...state.users.filter(x=>x.role==="direction")];
+  if(!activeChatPeer||!peers.find(p=>p.id===activeChatPeer)) activeChatPeer=peers[0]?.id;
+  const peer=peers.find(p=>p.id===activeChatPeer);
+  const msgs=peer?state.messages[convo(u.id,peer.id)]||[]:[];
+
+  c.innerHTML=`
+  <div style="display:flex;height:calc(100vh - 56px - 48px);gap:0;border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;background:var(--card)">
+    <div style="width:260px;border-right:1px solid var(--border);display:flex;flex-direction:column">
+      <div style="padding:14px 12px;border-bottom:1px solid var(--border);font-weight:800;font-size:14px">Conversations</div>
+      <div style="flex:1;overflow-y:auto;padding:8px">
+        ${peers.map(p=>`
+          <div class="chat-peer-item ${p.id===activeChatPeer?"active":""}" data-peer="${p.id}">
+            <div class="chat-peer-avatar" style="background:${avatarColor(p.id)}">${avatarInitials(p.name)}</div>
+            <div><div class="chat-peer-name">${p.name}</div><div class="chat-peer-unit">${p.unit}${p.role==="direction"?" • Direction":""}</div></div>
+          </div>`).join("")}
+      </div>
+    </div>
+    <div style="flex:1;display:flex;flex-direction:column;overflow:hidden">
+      ${peer?`
+      <div class="chat-head">
+        <div class="chat-peer-avatar" style="background:${avatarColor(peer.id)};width:36px;height:36px;border-radius:10px">${avatarInitials(peer.name)}</div>
+        <div><div style="font-weight:800">${peer.name}</div><div class="muted">${peer.unit}</div></div>
+      </div>
+      <div id="chatMessages" style="flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:12px">
+        ${msgs.length?msgs.map(m=>{
+          const isMe=m.from===u.id;
+          if(m.type==="swap") return `<div class="bubble ${isMe?"me":""}"><div style="font-weight:800">📅 Proposition d'échange</div><div style="margin-top:4px;font-size:13px">${m.summary}</div><div class="bubble-time">${m.time}</div></div>`;
+          return `<div class="bubble ${isMe?"me":""}"><div>${escH(m.text)}</div><div class="bubble-time">${m.time}</div></div>`;
+        }).join(""):
+        `<div class="chat-empty-state">${SVG.msg}<div>Démarrez la conversation avec ${peer.name}…</div></div>`}
+      </div>
+      <div style="padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:10px;background:rgba(13,25,41,.9)">
+        ${!isDir?`<button class="btn sm" id="btnSwapInChat" title="Proposer un échange">${SVG.swap}</button>`:""}
+        <input id="chatInput" placeholder="Message…" style="flex:1"/>
+        <button class="btn primary sm" id="btnSendMsg">${SVG.send}</button>
+      </div>`:`<div class="chat-empty-state" style="flex:1">${SVG.msg}<div>Sélectionnez une conversation</div></div>`}
+    </div>
+  </div>`;
+
+  // Bind
+  document.querySelectorAll(".chat-peer-item").forEach(el=>el.addEventListener("click",()=>{
+    activeChatPeer=el.getAttribute("data-peer");
+    viewMessages();
+    setTimeout(()=>document.getElementById("chatMessages")?.scrollTo(0,9999),50);
+  }));
+  function sendMsg(){
+    const input=document.getElementById("chatInput"); if(!input||!peer) return;
+    const text=input.value.trim(); if(!text) return;
+    const key=convo(u.id,peer.id); state.messages[key]=state.messages[key]||[];
+    state.messages[key].push({from:u.id,text,time:nowTime()});
+    saveState(); input.value=""; viewMessages();
+    setTimeout(()=>document.getElementById("chatMessages")?.scrollTo(0,9999),50);
+  }
+  document.getElementById("btnSendMsg")?.addEventListener("click",sendMsg);
+  document.getElementById("chatInput")?.addEventListener("keydown",e=>{if(e.key==="Enter")sendMsg();});
+  document.getElementById("btnSwapInChat")?.addEventListener("click",openSwapModal);
+  setTimeout(()=>document.getElementById("chatMessages")?.scrollTo(0,9999),50);
+}
+
+// ── Profil agent ───────────────────────────────────────────────────────────
+function viewProfil(){
+  const u=me(); const p=state.profiles[u.id]||{};
+  const notifs=(state.notifications||[]).filter(n=>n.userId===u.id);
+  setTimeout(()=>{ (state.notifications||[]).forEach(n=>{if(n.userId===u.id)n.read=true;}); saveState(); },300);
+  return `
+  <div class="grid-2">
+    <div class="col-stack">
+      ${notifs.filter(n=>!n.read).length?`<div class="card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="card-title">Notifications</div>
+          <button class="btn sm" id="btnClearNotifs">Tout marquer lu</button>
+        </div>
+        ${notifs.slice(0,5).map(n=>`<div class="notif-item ${n.read?"":"unread"}">${!n.read?`<div class="notif-dot"></div>`:""}<div><div style="font-size:13px">${n.msg}</div><div class="muted">${n.time}</div></div></div>`).join("")}
+      </div>`:""}
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:16px">Informations personnelles</div>
+        <div class="grid-form-2" style="gap:12px">
+          <div class="field"><label>Date de naissance</label><input id="p_birth" type="date" value="${p.birthDate||""}"/></div>
+          <div class="field"><label>Groupe sanguin</label><input id="p_blood" value="${p.bloodType||""}" placeholder="O+"/></div>
+          <div class="field"><label>Taille (cm)</label><input id="p_height" type="number" value="${p.heightCm||""}" placeholder="165"/></div>
+          <div class="field"><label>Poids (kg)</label><input id="p_weight" type="number" value="${p.weightKg||""}" placeholder="65"/></div>
+        </div>
+        <div class="hr"></div>
+        <div class="card-title" style="margin-bottom:12px">Santé</div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Allergies connues</label>
+          ${renderTagPickerD("p_allergies",p.allergies||"")}
+        </div>
+        <div class="field" style="margin-bottom:12px">
+          <label>Traitements en cours</label>
+          ${renderTagPickerD("p_treatments",p.treatments||"")}
+        </div>
+        <div class="field">
+          <label>Notes complémentaires</label>
+          <textarea id="p_notes">${p.notes||""}</textarea>
+        </div>
+        <div class="hr"></div>
+        <div class="card-title" style="margin-bottom:12px">Contact d'urgence</div>
+        <div class="grid-form-2">
+          <div class="field"><label>Nom</label><input id="p_em_name" value="${p.emergencyName||""}"/></div>
+          <div class="field"><label>Téléphone</label><input id="p_em_phone" value="${p.emergencyPhone||""}"/></div>
+        </div>
+        <button class="btn primary" style="margin-top:12px" id="btnSaveProfile">Enregistrer</button>
+        <div class="muted" id="profileSaved" style="margin-top:6px">${p.updatedAt?"Dernière mise à jour : "+p.updatedAt:""}</div>
+      </div>
+    </div>
+
+    <div class="col-stack">
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Absences / Congés</div>
+        <div class="field" style="margin-bottom:10px"><label>Type</label>
+          <select id="leaveType"><option>Congés payés</option><option>Congé sans solde</option><option>Arrêt maladie</option><option>Autre</option></select>
+        </div>
+        <div class="grid-form-2" style="margin-bottom:10px">
+          <div class="field"><label>Du</label><input type="date" id="leaveFrom" value="${iso(new Date())}"/></div>
+          <div class="field"><label>Au</label><input type="date" id="leaveTo" value="${iso(new Date())}"/></div>
+        </div>
+        <div class="field" style="margin-bottom:10px"><label>Note</label><input id="leaveNote" placeholder="Optionnel"/></div>
+        <button class="btn primary" id="btnSendLeave">Envoyer à la direction</button>
+        <div class="hr"></div>
+        <div class="section-title">Mes demandes</div>
+        ${state.leaveRequests.filter(r=>r.userId===u.id).slice().reverse().map(r=>{
+          const badge=r.status==="approved"?`<span class="badge ok">Approuvé</span>`:r.status==="refused"?`<span class="badge no">Refusé</span>`:`<span class="badge warn">En attente</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-weight:750">${r.type}</div><div class="muted">${fmtDate(r.from)} → ${fmtDate(r.to)}</div></div>${badge}</div>`;
+        }).join("")||`<div class="muted">Aucune demande.</div>`}
+      </div>
+
+      <div class="card">
+        <div class="card-title" style="margin-bottom:14px">Heures supplémentaires</div>
+        <div class="grid-form-2" style="margin-bottom:10px">
+          <div class="field"><label>Durée</label><select id="otMinutes"><option value="15">15 min</option><option value="30">30 min</option><option value="45">45 min</option><option value="60">1 h</option><option value="90">1 h 30</option></select></div>
+          <div class="field"><label>Date</label><input type="date" id="otDate" value="${iso(new Date())}"/></div>
+        </div>
+        <div class="field" style="margin-bottom:10px"><label>Motif</label><input id="otNote" placeholder="Ex : transmission longue…"/></div>
+        <button class="btn primary" id="btnSendOT">Déclarer</button>
+        <div class="hr"></div>
+        <div class="section-title">Mes déclarations</div>
+        ${state.overtime.filter(o=>o.userId===u.id).slice().reverse().map(r=>{
+          const badge=r.status==="approved"?`<span class="badge ok">Validé</span>`:r.status==="refused"?`<span class="badge no">Refusé</span>`:`<span class="badge warn">En attente</span>`;
+          return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border)"><div><div style="font-weight:750">${r.minutes} min</div><div class="muted">${fmtDate(r.date)}${r.note?" • "+r.note:""}</div></div>${badge}</div>`;
+        }).join("")||`<div class="muted">Aucune déclaration.</div>`}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── Profils direction ──────────────────────────────────────────────────────
+function viewProfils(){
+  const agents=state.users.filter(u=>u.role==="agent");
+  return `
+  <div class="grid-3">
+    ${agents.map(a=>{
+      const p=state.profiles[a.id]||{};
+      const filled=p.birthDate||p.bloodType||p.allergies;
+      return `<div class="card agent-row" style="flex-direction:column;align-items:flex-start;cursor:default">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;width:100%">
+          <div class="avatar-circle agent-avatar" style="background:${avatarColor(a.id)}">${avatarInitials(a.name)}</div>
+          <div style="flex:1"><div class="agent-name">${a.name}</div><div class="agent-unit">${a.unit}</div></div>
+          <button class="btn sm" data-open-profile="${a.id}">Voir fiche</button>
+        </div>
+        ${filled?`
+          <div style="font-size:12px;display:flex;flex-wrap:wrap;gap:6px">
+            ${p.bloodType?`<span class="badge">🩸 ${p.bloodType}</span>`:""}
+            ${p.allergies?`<span class="badge no">⚠ Allergie</span>`:""}
+            ${p.treatments?`<span class="badge warn">💊 Traitement</span>`:""}
+          </div>`:`<div class="muted">Fiche incomplète</div>`}
+      </div>`;
+    }).join("")}
+  </div>`;
+}
+
+// ── Validations ────────────────────────────────────────────────────────────
+function viewValidations(){
+  const sp=state.swapRequests.filter(r=>r.status==="pending").slice().reverse();
+  const lp=state.leaveRequests.filter(r=>r.status==="pending").slice().reverse();
+  const op=state.overtime.filter(r=>r.status==="pending").slice().reverse();
+  const total=sp.length+lp.length+op.length;
+  return `
+  <div style="margin-bottom:16px">
+    <div style="font-size:15px;color:var(--muted)">${total>0?`${total} demande(s) nécessitent votre attention`:"🎉 Aucune demande en attente !"}</div>
+  </div>
+  <div class="grid-3">
+    <div>
+      <div class="section-title">Échanges d'horaires (${sp.length})</div>
+      ${sp.length?sp.map(r=>{
+        const my=state.shifts.find(s=>s.id===r.requesterShiftId), co=state.shifts.find(s=>s.id===r.targetShiftId);
+        return `<div class="val-card">
+          <div class="val-card-head"><div>
+            <div class="val-card-title">${r.requesterName||userName(r.requesterId)}</div>
+            <div class="val-card-sub">↔ ${r.targetName||userName(r.targetId)}</div>
+            <div class="val-card-sub">${r.createdAt}</div>
+          </div></div>
+          <div style="margin-top:8px;font-size:12px">
+            <div>📤 ${my?fmtDate(my.date)+" "+my.start+"–"+my.end:"—"}</div>
+            <div>📥 ${co?fmtDate(co.date)+" "+co.start+"–"+co.end:"—"}</div>
+          </div>
+          <div class="val-actions">
+            <button class="btn sm primary" data-swap-approve="${r.id}">✓</button>
+            <button class="btn sm danger" data-swap-refuse="${r.id}">✗</button>
+          </div></div>`;
+      }).join(""):
+      `<div class="val-card" style="text-align:center;color:var(--muted)">Aucune demande.</div>`}
+    </div>
+    <div>
+      <div class="section-title">Absences & Congés (${lp.length})</div>
+      ${lp.length?lp.map(r=>`<div class="val-card">
+        <div class="val-card-title">${userName(r.userId)}</div>
+        <div class="val-card-sub">${r.type}</div>
+        <div class="val-card-sub">${fmtDate(r.from)} → ${fmtDate(r.to)} • <strong>${countDays(r.from,r.to)} jour(s)</strong></div>
+        ${r.note?`<div class="val-card-sub" style="margin-top:4px">${r.note}</div>`:""}
+        <div class="val-actions">
+          <button class="btn sm primary" data-leave-approve="${r.id}">✓ Accepter</button>
+          <button class="btn sm danger" data-leave-refuse="${r.id}">✗ Refuser</button>
+        </div></div>`).join(""):
+      `<div class="val-card" style="text-align:center;color:var(--muted)">Aucune demande.</div>`}
+    </div>
+    <div>
+      <div class="section-title">Heures supplémentaires (${op.length})</div>
+      ${op.length?op.map(r=>`<div class="val-card">
+        <div class="val-card-title">${userName(r.userId)}</div>
+        <div class="val-card-sub">${r.minutes} min • ${fmtDate(r.date)}</div>
+        ${r.note?`<div class="val-card-sub">${r.note}</div>`:""}
+        <div class="val-actions">
+          <button class="btn sm primary" data-ot-approve="${r.id}">✓ Valider</button>
+          <button class="btn sm danger" data-ot-refuse="${r.id}">✗ Refuser</button>
+        </div></div>`).join(""):
+      `<div class="val-card" style="text-align:center;color:var(--muted)">Aucune déclaration.</div>`}
+    </div>
+  </div>`;
+}
+
+// ── Tag picker desktop ────────────────────────────────────────────────────
+const ALLERGIES_LIST=["Pénicilline","Amoxicilline","Ampicilline","Céphalosporines","Tétracyclines","Macrolides","Fluoroquinolones","Sulfamides","Métronidazole","Clindamycine","Vancomycine","Aspirine","AINS (Ibuprofène, Kétoprofène…)","Paracétamol","Morphine","Codeïne","Tramadol","Diclofénac","Cortisone","Warfarine","Héparine","AOD (Xarelto, Eliquis…)","IEC (Ramipril, Périndopril…)","Bêtabloquants","Insuline","Metformine","Iode","Latex","Chlorhexidine","Arachides","Fruits à coque","Lait de vache (lactose)","Œufs","Gluten","Soja","Poissons","Crustacés","Mollusques","Céleri","Moutarde","Sésame","Sulfites","Kiwi","Pollen","Acariens","Poils de chat","Poils de chien","Venin d'abeille","Nickel","Parfums"];
+const MEDS_LIST=["Paracétamol 1g","Ibuprofène 400mg","Aspirine 100mg","Tramadol 50mg","Morphine LP","Lévothyroxine 25µg","Lévothyroxine 50µg","Lévothyroxine 75µg","Lévothyroxine 100µg","Metformine 500mg","Metformine 1000mg","Insuline Glargine","Bisoprolol 5mg","Amlodipine 5mg","Ramipril 5mg","Atorvastatine 20mg","Oméprazole 20mg","Pantoprazole 40mg","Sertraline 50mg","Escitalopram 10mg","Lorazépam 1mg","Diazépam 5mg","Zolpidem 10mg","Mélatonine 2mg","Ventoline (inhalateur)","Symbicort","Prednisolone 5mg","Calcium + Vitamine D","Vitamine D3 1000 UI","Alendronate 70mg","Furosémide 40mg","Spironolactone 25mg","Dabigatran 110mg","Apixaban 5mg","Rivaroxaban 20mg","Donépézil 10mg","Mémantine 10mg","Bisoprolol 2,5mg","Oméprazole 40mg","Colchicine 1mg","Allopurinol 300mg","Warfarine (Coumadine)"];
+
+function renderTagPickerD(id,currentValue){
+  const selected=currentValue?currentValue.split(",").map(s=>s.trim()).filter(Boolean):[];
+  return `<div class="tag-picker-wrap">
+    <input class="tag-picker-search" id="${id}_search" placeholder="Rechercher…" autocomplete="off"/>
+    <ul class="tag-suggestions hidden" id="${id}_sugg"></ul>
+    <div class="tag-sel-list" id="${id}_sel">
+      ${selected.map(s=>`<span class="tag-sel-chip" data-val="${escH(s)}">${escH(s)}<span class="rm">✕</span></span>`).join("")}
+    </div>
+  </div>`;
+}
+
+function bindTagPickerD(id){
+  const list=id==="p_allergies"?ALLERGIES_LIST:MEDS_LIST;
+  const search=document.getElementById(id+"_search");
+  const sugg=document.getElementById(id+"_sugg");
+  const selDiv=document.getElementById(id+"_sel");
+  if(!search) return;
+  const getSelected=()=>[...selDiv.querySelectorAll(".tag-sel-chip")].map(c=>c.getAttribute("data-val"));
+  function addItem(val){
+    val=val.trim(); if(!val||getSelected().includes(val)) return;
+    const span=document.createElement("span"); span.className="tag-sel-chip"; span.setAttribute("data-val",val);
+    span.innerHTML=escH(val)+`<span class="rm">✕</span>`;
+    span.querySelector(".rm").addEventListener("click",()=>span.remove());
+    selDiv.appendChild(span); search.value=""; sugg.innerHTML=""; sugg.classList.add("hidden");
+  }
+  selDiv.querySelectorAll(".tag-sel-chip .rm").forEach(rm=>rm.addEventListener("click",()=>rm.closest(".tag-sel-chip").remove()));
+  search.addEventListener("input",()=>{
+    const q=search.value.toLowerCase().trim();
+    if(!q){sugg.innerHTML="";sugg.classList.add("hidden");return;}
+    const m=list.filter(s=>s.toLowerCase().includes(q)&&!getSelected().includes(s)).slice(0,8);
+    sugg.innerHTML=m.length?m.map(x=>`<li data-val="${escH(x)}">${escH(x)}</li>`).join(""):
+      `<li style="color:var(--muted);font-style:italic;cursor:default">Aucun résultat — Entrée pour ajouter</li>`;
+    sugg.classList.remove("hidden");
+  });
+  sugg.addEventListener("click",e=>{const li=e.target.closest("li[data-val]");if(li)addItem(li.getAttribute("data-val"));});
+  search.addEventListener("keydown",e=>{
+    if(e.key==="Enter"){e.preventDefault();const f=sugg.querySelector("li[data-val]");if(f)addItem(f.getAttribute("data-val"));else if(search.value.trim())addItem(search.value);}
+    if(e.key==="Escape"){sugg.innerHTML="";sugg.classList.add("hidden");}
+  });
+  document.addEventListener("click",e=>{if(!search.closest(".tag-picker-wrap").contains(e.target)){sugg.innerHTML="";sugg.classList.add("hidden");}},{capture:true});
+}
+
+function readTagPickerD(id){ const d=document.getElementById(id+"_sel"); return d?[...d.querySelectorAll(".tag-sel-chip")].map(c=>c.getAttribute("data-val")).join(", "):""; }
+
+// ── Page handlers ──────────────────────────────────────────────────────────
+function bindPageHandlers(){
+  const u=me();
+
+  // Dashboard
+  document.getElementById("btnGoValidations")?.addEventListener("click",()=>{
+    currentPage="validations"; document.querySelectorAll(".nav-item").forEach(x=>x.classList.toggle("active",x.getAttribute("data-nav")==="validations")); document.getElementById("pageTitle").textContent="Validations"; renderPage();
+  });
+  document.getElementById("btnClearNotifs")?.addEventListener("click",()=>{
+    state.notifications=(state.notifications||[]).filter(n=>n.userId!==u.id); saveState(); renderPage();
+  });
+  document.getElementById("btnExportPDF")?.addEventListener("click",exportPDF);
+  document.getElementById("btnExportPDF2")?.addEventListener("click",exportPDF);
+  document.getElementById("btnAddShift")?.addEventListener("click",openAddShiftModal);
+
+  // Calendar
+  document.getElementById("btnCalPrev")?.addEventListener("click",()=>{
+    state.ui=state.ui||{};
+    const ym=state.ui.calendarYM||{y:new Date().getFullYear(),m:new Date().getMonth()};
+    let {y,m}=ym; if(state.ui.calendarView==="week"){state.ui.weekOffset=(state.ui.weekOffset||0)-1;}
+    else{m--;if(m<0){m=11;y++;}; state.ui.calendarYM={y,m};}
+    saveState(); renderPage();
+  });
+  document.getElementById("btnCalNext")?.addEventListener("click",()=>{
+    state.ui=state.ui||{};
+    const ym=state.ui.calendarYM||{y:new Date().getFullYear(),m:new Date().getMonth()};
+    let {y,m}=ym; if(state.ui.calendarView==="week"){state.ui.weekOffset=(state.ui.weekOffset||0)+1;}
+    else{m++;if(m>11){m=0;y++;}; state.ui.calendarYM={y,m};}
+    saveState(); renderPage();
+  });
+  document.getElementById("btnWeekPrev")?.addEventListener("click",()=>{ state.ui=state.ui||{}; state.ui.weekOffset=(state.ui.weekOffset||0)-1; saveState(); renderPage(); });
+  document.getElementById("btnWeekNext")?.addEventListener("click",()=>{ state.ui=state.ui||{}; state.ui.weekOffset=(state.ui.weekOffset||0)+1; saveState(); renderPage(); });
+  document.getElementById("btnViewMonth")?.addEventListener("click",()=>{ state.ui=state.ui||{}; state.ui.calendarView="month"; saveState(); renderPage(); });
+  document.getElementById("btnViewWeek")?.addEventListener("click",()=>{ state.ui=state.ui||{}; state.ui.calendarView="week"; saveState(); renderPage(); });
+  document.querySelectorAll(".unit-tab").forEach(t=>t.addEventListener("click",()=>{ state.ui=state.ui||{}; state.ui.calendarUnit=t.getAttribute("data-unit"); saveState(); renderPage(); }));
+  document.querySelectorAll(".cal-cell:not(.off)").forEach(c=>c.addEventListener("click",()=>{
+    state.ui=state.ui||{}; state.ui.calendarSelectedIso=c.getAttribute("data-cal-date"); saveState();
+    document.querySelectorAll(".cal-cell").forEach(x=>x.classList.toggle("sel",x===c));
+    const isDir=isDirection(); const uu=me();
+    document.getElementById("dayPanel").innerHTML=renderDayDetail(c.getAttribute("data-cal-date"),state.ui.calendarUnit||(isDir?"Unité 1":uu.unit),isDir?null:uu.id);
+  }));
+
+  // Echanges
+  const colSel=document.getElementById("swapColleague");
+  const colShiftSel=document.getElementById("swapColShift");
+  colSel?.addEventListener("change",()=>{
+    const sh=state.shifts.filter(s=>s.userId===colSel.value).sort((a,b)=>a.date.localeCompare(b.date));
+    colShiftSel.innerHTML=`<option value="">—</option>`+sh.map(s=>`<option value="${s.id}">${fmtDate(s.date)} • ${s.start}–${s.end}</option>`).join("");
+    colShiftSel.disabled=!colSel.value;
+  });
+  document.getElementById("btnSendSwap")?.addEventListener("click",()=>{
+    const myId=document.getElementById("swapMyShift")?.value;
+    const colId=colSel?.value; const colShiftId=colShiftSel?.value;
+    if(!myId||!colId||!colShiftId){ toast("Complète les 3 champs"); return; }
+    const col=state.users.find(x=>x.id===colId);
+    state.swapRequests.push({id:"sw_"+Math.random().toString(16).slice(2),requesterId:u.id,targetId:colId,requesterName:u.name,targetName:col?.name||colId,requesterShiftId:myId,targetShiftId:colShiftId,status:"pending",createdAt:new Date().toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})});
+    saveState(); toast("Demande envoyée ✅"); renderPage();
+  });
+
+  // Profil
+  document.getElementById("btnSaveProfile")?.addEventListener("click",()=>{
+    const p=state.profiles[u.id]||{};
+    p.birthDate=document.getElementById("p_birth")?.value||"";
+    p.heightCm=document.getElementById("p_height")?.value||"";
+    p.weightKg=document.getElementById("p_weight")?.value||"";
+    p.bloodType=document.getElementById("p_blood")?.value.trim()||"";
+    p.notes=document.getElementById("p_notes")?.value.trim()||"";
+    p.emergencyName=document.getElementById("p_em_name")?.value.trim()||"";
+    p.emergencyPhone=document.getElementById("p_em_phone")?.value.trim()||"";
+    p.allergies=readTagPickerD("p_allergies");
+    p.treatments=readTagPickerD("p_treatments");
+    p.updatedAt=new Date().toLocaleDateString("fr-FR",{dateStyle:"short"});
+    state.profiles[u.id]=p; saveState();
+    document.getElementById("profileSaved").textContent="Dernière mise à jour : "+p.updatedAt;
+    toast("Profil enregistré ✅");
+  });
+  document.getElementById("btnSendLeave")?.addEventListener("click",()=>{
+    state.leaveRequests.push({id:"lv_"+Math.random().toString(16).slice(2),userId:u.id,type:document.getElementById("leaveType").value,from:document.getElementById("leaveFrom").value,to:document.getElementById("leaveTo").value,note:document.getElementById("leaveNote")?.value.trim()||"",status:"pending",createdAt:nowTime()});
+    saveState(); toast("Demande envoyée ✅"); renderPage();
+  });
+  document.getElementById("btnSendOT")?.addEventListener("click",()=>{
+    const mins=parseInt(document.getElementById("otMinutes")?.value||"0",10);
+    const date=document.getElementById("otDate")?.value;
+    if(!date){ toast("Sélectionne une date"); return; }
+    state.overtime.push({id:"ot_"+Math.random().toString(16).slice(2),userId:u.id,minutes:mins,date,note:document.getElementById("otNote")?.value.trim()||"",status:"pending",createdAt:nowTime()});
+    saveState(); toast("Heures supp déclarées ✅"); renderPage();
+  });
+
+  // Profils direction
+  document.querySelectorAll("[data-open-profile]").forEach(btn=>btn.addEventListener("click",()=>openProfileModal(btn.getAttribute("data-open-profile"))));
+
+  // Validations
+  bindValidationBtns();
+
+  // Tag pickers
+  bindTagPickerD("p_allergies");
+  bindTagPickerD("p_treatments");
+}
+
+function bindValidationBtns(){
+  document.querySelectorAll("[data-swap-approve]").forEach(b=>b.addEventListener("click",()=>setSwapStatus(b.getAttribute("data-swap-approve"),"approved")));
+  document.querySelectorAll("[data-swap-refuse]").forEach(b=>b.addEventListener("click",()=>setSwapStatus(b.getAttribute("data-swap-refuse"),"refused")));
+  document.querySelectorAll("[data-leave-approve]").forEach(b=>b.addEventListener("click",()=>setLeaveStatus(b.getAttribute("data-leave-approve"),"approved")));
+  document.querySelectorAll("[data-leave-refuse]").forEach(b=>b.addEventListener("click",()=>setLeaveStatus(b.getAttribute("data-leave-refuse"),"refused")));
+  document.querySelectorAll("[data-ot-approve]").forEach(b=>b.addEventListener("click",()=>setOTStatus(b.getAttribute("data-ot-approve"),"approved")));
+  document.querySelectorAll("[data-ot-refuse]").forEach(b=>b.addEventListener("click",()=>setOTStatus(b.getAttribute("data-ot-refuse"),"refused")));
+}
+
+function setSwapStatus(id,status){
+  const r=state.swapRequests.find(x=>x.id===id); if(!r) return; r.status=status;
+  if(status==="approved"){ const s1=state.shifts.find(s=>s.id===r.requesterShiftId),s2=state.shifts.find(s=>s.id===r.targetShiftId); if(s1&&s2){const t=s1.userId;s1.userId=s2.userId;s2.userId=t;} }
+  const e=status==="approved"?"✅":"❌";
+  pushNotif(r.requesterId,`Échange avec ${r.targetName||""} ${status==="approved"?"validé":"refusé"} ${e}`);
+  pushNotif(r.targetId,`Échange avec ${r.requesterName||""} ${status==="approved"?"validé":"refusé"} ${e}`);
+  saveState(); toast(status==="approved"?"Échange validé ✅ — planning mis à jour":"Échange refusé ❌"); renderPage();
+}
+function setLeaveStatus(id,status){
+  const r=state.leaveRequests.find(x=>x.id===id); if(!r) return; r.status=status;
+  pushNotif(r.userId,`Votre demande de ${r.type} ${status==="approved"?"approuvée ✅":"refusée ❌"}`);
+  saveState(); toast(status==="approved"?"Congé approuvé ✅":"Congé refusé ❌"); renderPage();
+}
+function setOTStatus(id,status){
+  const r=state.overtime.find(x=>x.id===id); if(!r) return; r.status=status;
+  pushNotif(r.userId,`Vos ${r.minutes} min d'heures supp ${status==="approved"?"validées ✅":"refusées ❌"}`);
+  saveState(); toast(status==="approved"?"Heures supp validées ✅":"Heures supp refusées ❌"); renderPage();
+}
+
+function openProfileModal(uid){
+  const u=state.users.find(x=>x.id===uid), p=state.profiles[uid]||{};
+  openModal("Profil & santé — "+u.name,`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <div class="avatar-circle" style="width:48px;height:48px;border-radius:13px;font-size:16px;background:${avatarColor(uid)}">${avatarInitials(u.name)}</div>
+      <div><div style="font-weight:800;font-size:16px">${u.name}</div><div class="muted">${u.unit}</div></div>
+    </div>
+    <div class="grid-form-2" style="gap:10px;margin-bottom:12px">
+      <div><div class="muted">Naissance</div><div style="font-weight:750">${p.birthDate||"—"}</div></div>
+      <div><div class="muted">Groupe sanguin</div><div style="font-weight:750">${p.bloodType||"—"}</div></div>
+      <div><div class="muted">Taille</div><div style="font-weight:750">${p.heightCm?p.heightCm+" cm":"—"}</div></div>
+      <div><div class="muted">Poids</div><div style="font-weight:750">${p.weightKg?p.weightKg+" kg":"—"}</div></div>
+    </div>
+    <div class="hr"></div>
+    <div style="margin-bottom:10px"><div class="muted">Allergies</div><div style="margin-top:4px">${p.allergies||"—"}</div></div>
+    <div style="margin-bottom:10px"><div class="muted">Traitements</div><div style="margin-top:4px">${p.treatments||"—"}</div></div>
+    <div style="margin-bottom:10px"><div class="muted">Notes</div><div style="margin-top:4px">${p.notes||"—"}</div></div>
+    <div class="hr"></div>
+    <div><div class="muted">Contact d'urgence</div><div style="font-weight:750;margin-top:4px">${p.emergencyName||"—"} — ${p.emergencyPhone||"—"}</div></div>
+    ${p.updatedAt?`<div class="muted" style="margin-top:12px">Mis à jour : ${p.updatedAt}</div>`:""}
+  `,`<button class="btn primary" onclick="closeModal()">Fermer</button>`);
+}
+
+function openSwapModal(){
+  const u=me(); const peer=state.users.find(x=>x.id===activeChatPeer);
+  if(!peer) return;
+  const myShifts=state.shifts.filter(s=>s.userId===u.id).sort((a,b)=>a.date.localeCompare(b.date));
+  const peerShifts=state.shifts.filter(s=>s.userId===peer.id).sort((a,b)=>a.date.localeCompare(b.date));
+  openModal("Proposer un échange",`
+    <div class="field" style="margin-bottom:12px"><label>Mon horaire</label>
+      <select id="m_my"><option value="">—</option>${myShifts.map(s=>`<option value="${s.id}">${fmtDate(s.date)} • ${s.start}–${s.end}</option>`).join("")}</select>
+    </div>
+    <div class="field" style="margin-bottom:12px"><label>Horaire de ${peer.name}</label>
+      <select id="m_peer"><option value="">—</option>${peerShifts.map(s=>`<option value="${s.id}">${fmtDate(s.date)} • ${s.start}–${s.end}</option>`).join("")}</select>
+    </div>
+    <div class="field"><label>Commentaire</label><input id="m_note" placeholder="Optionnel…"/></div>`,
+  `<button class="btn ghost" onclick="closeModal()">Annuler</button>
+   <button class="btn primary" id="m_send">Envoyer</button>`);
+  document.getElementById("m_send").onclick=()=>{
+    const myId=document.getElementById("m_my").value, pid=document.getElementById("m_peer").value;
+    if(!myId||!pid){ toast("Choisis les deux horaires"); return; }
+    const req={id:"sw_"+Math.random().toString(16).slice(2),requesterId:u.id,targetId:peer.id,requesterName:u.name,targetName:peer.name,requesterShiftId:myId,targetShiftId:pid,status:"pending",createdAt:new Date().toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})};
+    state.swapRequests.push(req);
+    const key=convo(u.id,peer.id); state.messages[key]=state.messages[key]||[];
+    const my=state.shifts.find(s=>s.id===myId),pe=state.shifts.find(s=>s.id===pid);
+    state.messages[key].push({from:u.id,type:"swap",summary:`${fmtDate(my.date)} ${my.start}–${my.end} ↔ ${fmtDate(pe.date)} ${pe.start}–${pe.end}`,time:nowTime()});
+    saveState(); closeModal(); toast("Échange envoyé ✅"); viewMessages();
+  };
+}
+
+function openAddShiftModal(){
+  const agents=state.users.filter(u=>u.role==="agent");
+  openModal("Ajouter un horaire",`
+    <div class="field" style="margin-bottom:12px"><label>Agent</label>
+      <select id="as_agent">${agents.map(a=>`<option value="${a.id}">${a.name} — ${a.unit}</option>`).join("")}</select>
+    </div>
+    <div class="grid-form-2" style="margin-bottom:12px">
+      <div class="field"><label>Date</label><input type="date" id="as_date" value="${iso(new Date())}"/></div>
+      <div class="field"><label>Poste</label>
+        <select id="as_label"><option value="Matin">Matin (07:00–14:00)</option><option value="Soir">Soir (14:00–21:30)</option><option value="Nuit">Nuit (21:00–07:30)</option><option value="Journée">Journée (08:00–20:00)</option></select>
+      </div>
+    </div>
+    <div class="grid-form-2">
+      <div class="field"><label>Début</label><input type="time" id="as_start" value="07:00"/></div>
+      <div class="field"><label>Fin</label><input type="time" id="as_end" value="14:00"/></div>
+    </div>`,
+  `<button class="btn ghost" onclick="closeModal()">Annuler</button>
+   <button class="btn primary" id="as_save">Enregistrer</button>`);
+  document.getElementById("as_label")?.addEventListener("change",e=>{
+    const m={Matin:["07:00","14:15"],Soir:["14:00","21:30"],Nuit:["21:00","07:30"],Journée:["08:00","20:00"]}[e.target.value];
+    if(m){document.getElementById("as_start").value=m[0];document.getElementById("as_end").value=m[1];}
+  });
+  document.getElementById("as_save").onclick=()=>{
+    const agentId=document.getElementById("as_agent").value;
+    const agent=state.users.find(u=>u.id===agentId);
+    const date=document.getElementById("as_date").value;
+    const label=document.getElementById("as_label").value;
+    const start=document.getElementById("as_start").value;
+    const end=document.getElementById("as_end").value;
+    if(!date||!start||!end){ toast("Complète tous les champs"); return; }
+    state.shifts.push({id:"s_"+Math.random().toString(16).slice(2),userId:agentId,unit:agent?.unit||"Unité 1",date,start,end,label});
+    saveState(); closeModal(); toast("Horaire ajouté ✅"); renderPage();
+  };
+}
+
+// ── Export PDF ────────────────────────────────────────────────────────────
+function exportPDF(){
+  const now=new Date(); const ym=state.ui?.calendarYM||{y:now.getFullYear(),m:now.getMonth()};
+  const {y,m}=ym; const daysInMonth=new Date(y,m+1,0).getDate();
+  const monthLabel=new Date(y,m,1).toLocaleDateString("fr-FR",{month:"long",year:"numeric"});
+  const units=[...new Set(state.shifts.map(s=>s.unit))].sort();
+  const agents=state.users.filter(u=>u.role==="agent");
+  let tables="";
+  for(const unit of units){
+    const unitAgents=agents.filter(a=>a.unit===unit);
+    let rows="";
+    for(let d=1;d<=daysInMonth;d++){
+      const date=new Date(y,m,d); const di=iso(date);
+      const dw=date.getDay(); const we=dw===0||dw===6;
+      const dayShifts=state.shifts.filter(s=>s.unit===unit&&s.date===di);
+      const cells=unitAgents.map(a=>{const s=dayShifts.find(sh=>sh.userId===a.id);return s?`<td style="padding:5px 8px;font-size:11px;background:${s.label==="Nuit"?"#1a0d2e":s.label==="Soir"?"#2a1a0e":"#0e1a2e"}">${s.start}–${s.end}<br><span style="color:#888;font-size:10px">${s.label}</span></td>`:`<td style="padding:5px 8px;color:#444;font-size:11px">—</td>`;}).join("");
+      rows+=`<tr style="${we?"background:#0f1520":""}"><td style="padding:5px 8px;font-size:11px;color:#aaa;white-space:nowrap">${date.toLocaleDateString("fr-FR",{weekday:"short",day:"2-digit",month:"short"})}</td>${cells}</tr>`;
+    }
+    const heads=unitAgents.map(a=>`<th style="padding:8px;font-size:11px;text-align:left">${a.name.split(" ")[0]}</th>`).join("");
+    tables+=`<h2 style="margin:20px 0 8px;font-size:14px;border-bottom:1px solid #222;padding-bottom:5px">${unit}</h2><table style="width:100%;border-collapse:collapse;border:1px solid #1e2d4a"><thead><tr style="background:#0f1a30"><th style="padding:8px;font-size:11px;text-align:left">Date</th>${heads}</tr></thead><tbody>${rows}</tbody></table>`;
+  }
+  const html=`<!DOCTYPE html><html lang="fr"><head><meta charset="utf-8"><title>Planning EHPAD</title><style>body{font-family:system-ui;background:#07101f;color:#e8f0ff;padding:20px}td,th{border:1px solid #1e2d4a}@media print{body{background:#fff;color:#000}td,th{border:1px solid #ccc}}</style></head><body><h1 style="font-size:18px;margin-bottom:4px">Planning EHPAD — ${capitalize(monthLabel)}</h1><p style="color:#888;font-size:12px">Généré le ${now.toLocaleDateString("fr-FR",{dateStyle:"full"})}</p>${tables}<script>window.print();</`+`script></body></html>`;
+  const w=window.open("","_blank"); if(w){w.document.write(html);w.document.close();}else toast("Autorisez les pop-ups");
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────
+function openModal(title,body,foot){
+  document.getElementById("modalTitle").textContent=title;
+  document.getElementById("modalBody").innerHTML=body;
+  document.getElementById("modalFoot").innerHTML=foot||"";
+  document.getElementById("modalOverlay").classList.remove("hidden");
+  document.getElementById("modalClose").onclick=closeModal;
+  document.getElementById("modalOverlay").addEventListener("click",e=>{if(e.target===document.getElementById("modalOverlay"))closeModal();},{once:true});
+}
+function closeModal(){ document.getElementById("modalOverlay").classList.add("hidden"); document.getElementById("modalBody").innerHTML=""; document.getElementById("modalFoot").innerHTML=""; }
+
+// ── Toast ──────────────────────────────────────────────────────────────────
+function toast(msg){
+  const el=document.getElementById("toast"); if(!el) return;
+  el.textContent=msg; el.classList.remove("hidden");
+  clearTimeout(window.__t); window.__t=setTimeout(()=>el.classList.add("hidden"),2400);
+}
+
+function capitalize(s){ return s?s.charAt(0).toUpperCase()+s.slice(1):s; }
+
+// ── Boot ──────────────────────────────────────────────────────────────────
+render();
+saveState();
+</script>
 </body>
 </html>
